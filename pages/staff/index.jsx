@@ -1,24 +1,20 @@
 import React from 'react';
 import Layout from '../../components/Layouts/Layout';
 
-function Inventory() {
-  return (
-    <div>
-      Inventory
-    </div>
-  );
+function Index() {
+  return null;
 }
 
 export async function getServerSideProps() {
   return {
     redirect: {
-      destination: '/inventory/products',
+      destination: '/staff/employees',
       permanent: false,
     },
   };
 }
 
-Inventory.getLayout = function getLayout(page) {
+Index.getLayout = function getLayout(page) {
   return (
     <Layout>
       {page}
@@ -26,4 +22,4 @@ Inventory.getLayout = function getLayout(page) {
   );
 };
 
-export default Inventory;
+export default Index;

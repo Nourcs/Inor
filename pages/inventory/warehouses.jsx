@@ -30,7 +30,7 @@ const HEADINGS = [
 
 ];
 
-function Categories() {
+function Warehouses() {
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
 
@@ -62,25 +62,27 @@ function Categories() {
               type="button"
               className="text-dark-100 font-bold text-sm h-10 px-10 bg-main-900 rounded-full flex items-center justify-center"
             >
-              Add Category
+              Add Warehouse
             </button>
           </div>
         </Table>
       </div>
       {showModal && (
-      <Modal closeModal={() => setShowModal(false)} title="Add Category" />
+      <Modal closeModal={() => setShowModal(false)} title="Add Warehouse" />
       )}
     </>
 
   );
 }
 
-Categories.getLayout = function getLayout(page) {
+Warehouses.getLayout = function getLayout(page) {
   return (
-    <Layout>
-      {page}
-    </Layout>
+    <div className="text-dark-900">
+      <Layout>
+        {page}
+      </Layout>
+    </div>
   );
 };
 
-export default Categories;
+export default Warehouses;

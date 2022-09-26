@@ -8,21 +8,24 @@ module.exports = {
     extend: {
       colors: {
         dark: {
-          900: '#343A40', // Main
-          800: '#5C6166',
-          700: '#85888C',
-          600: '#C1C3C5', // Gray Text + Inactive Buttons
-          500: '#D6D7D9', // Inactive Text Buttons
-          400: '#E0E1E2', // Gray Lines
-          300: '#EAEBEB',
-          200: '#F4F5F5', // Background Hover
-          100: '#F8F9F9', // Main Background
+          900: '#242424', // Main
+          700: '#777777',
+          600: '#959595', // Mixed Text + Gray Text
+          500: '#BABABA', // Icons + Placeholder
+          400: '#C5C5C5', // Inactive Buttons
+          300: '#DFDFDF', // Borders + Gray Lines
+          200: '#EAEAEA', // Background Hover
+          100: '#F5F5F5', // Light Background
         },
-        orange: {
-          900: '#FD7670',
+        main: {
+          // 900: '#219ebc',
+          // 900: '#242424',
+          900: '#84a98c',
+          // 900: '#40916c',
         },
       },
     },
   },
-  plugins: [],
+  plugins: [
+  ],
 };

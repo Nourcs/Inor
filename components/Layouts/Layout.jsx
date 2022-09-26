@@ -1,113 +1,214 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  Bell, ChevronRight, File, Layout, Package, ShoppingCart, Users,
+  Bell, ChevronDown, File, Layout, Package, Power, ShoppingCart, Tag, Users,
 } from 'react-feather';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { signOut } from 'firebase/auth';
+import Logo from '../../public/logo';
+import { auth } from '../../utils/firebase';
+import { useAppContext } from '../../context/state';
+import Spinner from '../../public/spinner';
 
 const NAV_ROUTES = [
-  { value: 'dashboard', name: 'Dashboard', icon: <Layout className="h-5 w-5" /> },
-  { value: 'inventory', name: 'Inventory', icon: <Package className="h-5 w-5" /> },
-  { value: 'orders', name: 'Orders', icon: <ShoppingCart className="h-5 w-5" /> },
-  { value: 'invoice', name: 'Invoice', icon: <File className="h-5 w-5" /> },
-  { value: 'staff', name: 'Staff', icon: <Users className="h-5 w-5" /> },
+  { value: 'dashboard', name: 'Dashboard', icon: <Layout className="h-4 w-4" /> },
+  { value: 'inventory', name: 'Inventory', icon: <Package className="h-4 w-4" /> },
+  { value: 'sales', name: 'Sales', icon: <Tag className="h-4 w-4" /> },
+  { value: 'purchases', name: 'Purchases', icon: <ShoppingCart className="h-4 w-4" /> },
+  { value: 'invoices', name: 'Invoices', icon: <File className="h-4 w-4" /> },
+  { value: 'staff', name: 'Staff', icon: <Users className="h-4 w-4" /> },
 ];
 
 function Main({ children }) {
+  const router = useRouter();
+  const {
+    loading, user, setUser, setLoading,
+  } = useAppContext();
+
   const { pathname } = useRouter();
+  const [notifications, setNotifications] = useState(true);
 
-  return (
-    <div className="flex h-screen items-start bg-dark-100 overflow-y-hidden">
-      <div className="w-52 h-full bg-white flex flex-col items-center pt-5">
-        <Link href="/dashboard">
-          <a>
-            <img
-              alt="topbar"
-              className="w-16 stroke-white	"
-              src="/logo.svg"
-            />
-          </a>
-        </Link>
-        <div className="flex-1 pb-5 flex items-center">
-          <div>
-            {NAV_ROUTES.map((item) => (
-              <Link href={`/${item.value}`}>
-                <a className={`flex items-center justify-start mt-5 transition duration-100 ease-out ${pathname.includes(item.value) ? 'text-orange-900' : 'text-dark-500 hover:text-dark-900'}`}>
-                  <div className="mr-3">
-                    {item.icon}
-                  </div>
-                  <span className="font-bold">{item.name}</span>
-                </a>
-              </Link>
-            ))}
+  const handleSignOut = () => {
+    signOut(auth).then(() => {
+      // Sign-out successful.
+      setLoading(true);
+      setUser(null);
+    }).catch((error) => {
+      // An error happened.
+      console.error(error);
+    });
+  };
 
-          </div>
-        </div>
-        <div className="flex items-center justify-between w-full px-3 border-t border-dark-400 h-16">
-          <div className="flex items-center leading-5">
-            <img
-              alt="topbar"
-              className="h-10 w-10 object-cover rounded-full mr-3"
-              src="https://images.unsplash.com/photo-1634250420331-68d96d14ec5b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"
-            />
-            <div className="leading-4">
-              <h3 className="text-sm text-dark-600">
-                Business
-              </h3>
-              <h2 className="font-extrabold">
-                Starbucks
-              </h2>
+  if (!loading && !user) {
+    router.push('/login');
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center w-screen h-screen">
+        <Spinner className="h-12 w-12" />
+      </div>
+    );
+  }
+
+  if (!loading && user) {
+    return (
+      // <div className="flex h-screen">
+      //   <div className="bg-dark-100 w-60 flex flex-col justify-between p-5 shrink-0">
+      //     <div className="flex flex-col items-center">
+      //       <Link href="/">
+      //         <a>
+      //           <Logo className="fill-main-900 h-20" />
+      //         </a>
+      //       </Link>
+      //       <div className="mt-10 w-full">
+      //         {NAV_ROUTES.map((item) => (
+      //           <Link href={`/${item.value}`} key={`route_${item.value}`}>
+      //             <a
+      //               className={`mt-3 flex justify-center h-10 px-3 text-sm font-semibold rounded-md ${pathname.includes(item.value) ? 'bg-main-900 text-dark-100' : 'hover:bg-dark-200'}`}
+      //             >
+      //               <div className="flex items-center w-32">
+      //                 <div className="mr-3">
+      //                   {item.icon}
+      //                 </div>
+      //                 {item.name}
+      //               </div>
+      //             </a>
+      //           </Link>
+      //         ))}
+      //       </div>
+      //     </div>
+      //     <button
+      //       onClick={handleSignOut}
+      //       type="button"
+      //       className="mt-3 justify-center h-10 px-3 text-sm font-semibold rounded-md hover:bg-dark-200 flex items-center"
+      //     >
+      //       <div className="flex items-center w-32">
+      //         <div className="mr-3">
+      //           <Power className="h-4 w-4" />
+      //         </div>
+      //         Logout
+      //       </div>
+      //     </button>
+      //   </div>
+      //   <div className="flex-1 flex flex-col h-full w-full max-w-[84vw]">
+      //     <div className="py-3 flex items-stretch p-5 border-b border-dark-300">
+      //       <div className="flex-1 flex items-center justify-between">
+      //         <div className="text-dark-600">
+      //           Your free trial expires in
+      //           {' '}
+      //           <span className="text-dark-900 font-semibold">12 days.</span>
+      //         </div>
+      //         <button type="button" className="flex items-center justify-center bg-main-900 rounded-full h-10 w-48 text-white text-sm font-semibold">
+      //           Upgrade Plan
+      //         </button>
+      //       </div>
+      //       <button onClick={() => setNotifications(false)} className="px-5 mx-5 border-l border-r border-dark-300 text-dark-500 hover:text-main-900 transition duration-100 ease-in-out">
+      //         <div className="relative">
+      //           <Bell className="h-6 w-6" />
+      //           {notifications && (<div className="bg-main-900 border-[3px] border-white w-3 h-3 rounded-full absolute -top-[3px] right-[1px]" />
+      //           )}
+      //         </div>
+      //       </button>
+      //       <button type="button" className="flex group">
+      //         <img
+      //           alt="topbar"
+      //           className="h-10 w-10 object-cover rounded-full mr-3"
+      //           src={`${user.photoURL}`}
+      //         />
+      //         <div className="mr-5 text-left self-center">
+      //           <h2 className="font-semibold leading-4">{user.displayName}</h2>
+      //           <h4 className="text-sm text-dark-600 leading-4">CEO</h4>
+      //         </div>
+      //         <div className="text-dark-500 group-hover:text-main-900 transition duration-100 ease-in-out mt-0.5">
+      //           <ChevronDown className="h-5 w-5" />
+      //         </div>
+      //       </button>
+      //     </div>
+      //     <div className="overflow-y-auto flex flex-col main-scrollbar">
+      //       {children}
+      //     </div>
+      //   </div>
+      // </div>
+      <div className="flex h-screen w-screen">
+        <div className="w-60 bg-dark-200 shrink-0 hidden md:flex p-5  flex-col justify-between">
+          <div className="flex flex-col items-center">
+            <Link href="/">
+              <a>
+                <Logo className="fill-main-900 h-20" />
+              </a>
+            </Link>
+            <div className="mt-10 w-full">
+              {NAV_ROUTES.map((item) => (
+                <Link href={`/${item.value}`} key={`route_${item.value}`}>
+                  <a
+                    className={`mt-3 flex justify-center h-10 px-3 text-sm font-semibold rounded-md ${pathname.includes(item.value) ? 'bg-main-900 text-dark-100' : 'hover:bg-dark-200'}`}
+                  >
+                    <div className="flex items-center w-32">
+                      <div className="mr-3">
+                        {item.icon}
+                      </div>
+                      {item.name}
+                    </div>
+                  </a>
+                </Link>
+              ))}
             </div>
           </div>
-          <button type="button">
-            <div>
-              <ChevronRight className="h-5 w-5" />
+          <button
+            onClick={handleSignOut}
+            type="button"
+            className="mt-3 justify-center h-10 px-3 text-sm font-semibold rounded-md hover:bg-dark-200 flex items-center"
+          >
+            <div className="flex items-center w-32">
+              <div className="mr-3">
+                <Power className="h-4 w-4" />
+              </div>
+              Logout
             </div>
           </button>
         </div>
-      </div>
-      <div className="flex-1 flex flex-col h-full">
-        <div className="bg-dark-100 border-b border-dark-400 flex items-center p-5">
-          <div className="flex-1 pr-5 flex items-center justify-between">
-            <div>
-              Your free trial expires in
-              {' '}
-              <span className=" font-extrabold">12 days</span>
+        <div className="flex-1 border-b border-dark-300 flex flex-col shrink overflow-hidden">
+          <div className="h-16 shrink-0 flex items-center px-5">
+            <div className="flex-1 flex items-center justify-between">
+              <div className="text-dark-600 hidden lg:block">
+                Your free trial expires in
+                {' '}
+                <span className="text-dark-900 font-semibold">12 days.</span>
+              </div>
+              <button type="button" className="flex items-center justify-center bg-main-900 rounded-full h-10 px-10 text-white text-sm font-semibold">
+                Upgrade Plan
+              </button>
             </div>
-            <button type="button" className="font-bold text-sm bg-orange-900 rounded-full text-dark-100 px-8 h-10">
-              Upgrade Membership
+            <button onClick={() => setNotifications(false)} className="px-5 mx-5 border-l border-r border-dark-300 text-dark-500 hover:text-main-900 transition duration-100 ease-in-out">
+              <div className="relative">
+                <Bell className="h-6 w-6" />
+                {notifications && (<div className="bg-main-900 border-[3px] border-white w-3 h-3 rounded-full absolute -top-[3px] right-[1px]" />
+                )}
+              </div>
             </button>
-          </div>
-          <div className="border-x border-dark-400 flex items-center justify-center">
-            <button className="flex items-center justify-center h-10 w-16" type="button">
-              <div>
-                <Bell className="h-5 w-5 text-dark-600" />
+            <button type="button" className="flex group">
+              <img
+                alt="topbar"
+                className="h-10 w-10 object-cover rounded-full mr-3"
+                src={`${user.photoURL}`}
+              />
+              <div className="mr-5 text-left self-center">
+                <h2 className="font-semibold leading-4">{user.displayName}</h2>
+                <h4 className="text-sm text-dark-600 leading-4">CEO</h4>
+              </div>
+              <div className="text-dark-500 group-hover:text-main-900 transition duration-100 ease-in-out mt-0.5">
+                <ChevronDown className="h-5 w-5" />
               </div>
             </button>
           </div>
-          <div className="pl-5 flex items-center leading-5">
-            <img
-              alt="topbar"
-              className="h-10 w-10 object-cover rounded-full mr-3"
-              src="https://images.unsplash.com/photo-1506863530036-1efeddceb993?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1944&q=80"
-            />
-            <div>
-              <h2 className=" font-extrabold">
-                Nour Cherif Essoussi
-              </h2>
-              <h3 className="text-sm text-dark-600">
-                CEO
-              </h3>
-            </div>
+          <div className="h-full overflow-y-auto max-w-full flex flex-col">
+            {children}
           </div>
         </div>
-        <div className="overflow-y-auto flex flex-col h-screen">
-          {children}
-        </div>
       </div>
-
-    </div>
-  );
+    );
+  }
 }
 
 export default Main;

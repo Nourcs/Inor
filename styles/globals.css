@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+
+@layer base {
+  ::-webkit-scrollbar-track {
+    position: absolute;
+    background-color: theme('colors.dark.300');
+  }
+
+  ::-webkit-scrollbar {
+    position: absolute;
+    width: 5px;
+    height: 3px;
+    background-color: theme('colors.dark.300');
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: theme('colors.dark.500');
+  }
+}
