@@ -3,7 +3,7 @@ import { Maximize } from 'react-feather';
 
 function Products({ products }) {
   return (
-    <section className="w-2/3">
+    <section className="w-full lg:w-2/3">
       <button
         type="button"
         className="mr-5 text-lg font-extrabold transition duration-100 ease-in-out"
@@ -17,9 +17,9 @@ function Products({ products }) {
         <span className="block flex-1">Revenue</span>
         <span className="w-10 ml-4" />
       </div>
-      <div className="bg-dark-100 rounded-b-md h-80 overflow-y-scroll">
+      <div className="bg-dark-100 rounded-b-md h-80 lg:h-[453px] overflow-y-scroll">
         {products.map((item, index) => (
-          <button key={`product_${index}`} type="button" className={`group flex items-stretch w-full text-left p-4 transition duration-100 ease-in-out hover:bg-dark-200 ${index !== 0 && 'border-t border-dark-300'}`}>
+          <button key={`product_${item.name}`} type="button" className={`group flex items-stretch w-full text-left p-4 transition duration-100 ease-in-out hover:bg-dark-200 ${index !== 0 && 'border-t border-dark-300'}`}>
             <div className="flex-[1.5_1.5_0%] flex items-center">
               <div className="mr-3 h-6 w-6 font-bold text-dark-100 bg-main-900 rounded-md flex items-center justify-center text-xs">
                 {index + 1}

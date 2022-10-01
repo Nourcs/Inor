@@ -3,29 +3,30 @@ import { ExternalLink } from 'react-feather';
 
 function Activity({ feed }) {
   return (
-    <>
+    <section className="mt-5 lg:mt-0">
       <div className="flex items-center justify-between">
         <div className="text-lg font-extrabold">
-          Activity Feed
+          <h2>Activity Feed</h2>
         </div>
       </div>
-      <div className="flex-1 bg-dark-100 rounded-lg mt-1 overflow-y-auto min-h-[444px] max-h-[444px] flex flex-col">
-        {feed.map((item) =>
-          // const initials = `${item.employee.split(' ')[0][0]}${item.employee.split(' ')[item.employee.split(' ').length - 1][0]}`;
-          (
-            <button
-              type="button"
-              className="group transition duration-100 ease-in-out flex py-3 items-stretch text-left hover:bg-dark-200 px-5 border-b border-dark-300 last:border-none first:pt-5 last:pb-5"
-            >
-              <span className="text-sm font-semibold text-main-900 mr-5 pt-0.5">{item.timestamp}</span>
+      <div className="flex-1 bg-dark-100 rounded-lg mt-1 overflow-y-auto h-80 lg:min-h-[432px] lg:max-h-[432px] flex flex-col">
+        {feed.map((item) => (
+          <button
+            key={`activity_${item.timestamp}`}
+            type="button"
+            className="group transition duration-100 ease-in-out flex py-4 items-stretch text-left hover:bg-dark-200 px-5 border-b border-dark-300 last:border-none"
+          >
+            <div className="mr-5 lg:mr-2 flex flex-row lg:flex-col flex-1">
+              <span className="text-sm font-semibold text-main-900 mr-5 pt-0.5 text-justify">{item.timestamp}</span>
               <p className="flex-1 leading-snug">{item.notificaction}</p>
-              <div className="flex items-center w-10 justify-end text-dark-500 group-hover:text-main-900 transition duration-100 ease-in-out">
-                <ExternalLink className="h-5 w-5" />
-              </div>
-            </button>
-          ))}
+            </div>
+            <div className="flex items-center justify-end text-dark-400 group-hover:text-main-900 transition duration-100 ease-in-out">
+              <ExternalLink className="h-5 w-5" />
+            </div>
+          </button>
+        ))}
       </div>
-    </>
+    </section>
   );
 }
 

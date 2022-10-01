@@ -1,88 +1,69 @@
 import React, { useState } from 'react';
 
-import { Search } from 'react-feather';
-import InventoryLayout from '../../components/Layouts/Inventory';
 import Layout from '../../components/Layouts/Layout';
+import InventoryLayout from '../../components/Layouts/Inventory';
 
 import Table from '../../components/Table/Table';
-import Modal from '../../components/Modal/Modal';
 
-const DATA = [
+const data = Array(50)
+  .fill(undefined)
+  .map((_, index) => ({
+    sku: `${index + 1}`,
+    name: `Name: ${index + 1}`,
+    category: `Category: ${index + 1}`,
+    supplier: `Supplier:${index + 1}`,
+    warehouse: `Warehouse: ${index + 1}`,
+    quantity: `Quantity: ${index + 1}`,
+    price: `Price: ${index + 1}`,
+    sales: `Sales: ${index + 1}`,
+  }));
+
+const columns = [
   {
-    code: 1, name: 'Sneakers',
+    key: 'sku', title: 'SKU', width: 175,
   },
   {
-    code: 4, name: 'T-Shirt',
+    key: 'name', title: 'Name', width: 200,
   },
   {
-    code: 5, name: 'Coat',
+    key: 'category', title: 'Category', width: 175,
+  },
+  {
+    key: 'supplier', title: 'Supplier', width: 175,
+  },
+  {
+    key: 'warehouse', title: 'Warehouse', width: 175,
+  },
+  {
+    key: 'quantity', title: 'Quantity', width: 175,
+  },
+  {
+    key: 'price', title: 'Price', width: 175,
+  },
+  {
+    key: 'sales', title: 'Sales', width: 175,
   },
 ];
 
-const HEADINGS = [
-  { label: 'Code', value: 'code' },
-  { label: 'Name', value: 'name' },
-  { label: '', value: '' },
-  { label: '', value: '' },
-  { label: '', value: '' },
-  { label: '', value: '' },
-  { label: '', value: '' },
-
-];
-
-function Warehouses() {
-  const [search, setSearch] = useState('');
-  const [showModal, setShowModal] = useState(false);
-
+function Products() {
   return (
-    <>
-      <div className="flex-1 flex flex-col justify-between overflow-hidden">
-        <div className="p-5">
-          <InventoryLayout />
-        </div>
-        <Table initialData={DATA} headings={HEADINGS} search={search}>
-          <div className="w-full max-w-lg border-2 border-dark-300 rounded-full flex items-center px-3 h-10">
-            <div className="mr-3">
-              <Search className="h-5 w-5 text-dark-400" />
-            </div>
-            <input
-              type="text"
-              className="w-full bg-transparent focus:outline-none pr-2 placeholder:text-dark-400 font-bold"
-              placeholder="Search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-          <div className="flex items-center">
-            <button type="button" className="border-2 border-main-900 text-main-900 font-bold text-sm h-10 px-5 rounded-full mr-3 flex items-center justify-center hover:bg-main-900 hover:text-dark-100 transition duration-100 ease-in-out">
-              Export All
-            </button>
-            <button
-              onClick={() => setShowModal(!showModal)}
-              type="button"
-              className="text-dark-100 font-bold text-sm h-10 px-10 bg-main-900 rounded-full flex items-center justify-center"
-            >
-              Add Warehouse
-            </button>
-          </div>
-        </Table>
+    <div className="flex flex-col flex-1 overflow-hidden">
+      <div className="h-16 shrink-0 flex items-center px-5">
+        <InventoryLayout />
       </div>
-      {showModal && (
-      <Modal closeModal={() => setShowModal(false)} title="Add Warehouse" />
-      )}
-    </>
-
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Table data={data} columns={columns} />
+      </div>
+    </div>
   );
 }
 
-Warehouses.getLayout = function getLayout(page) {
+Products.getLayout = function getLayout(page) {
   return (
-    <div className="text-dark-900">
-      <Layout>
-        {page}
-      </Layout>
-    </div>
+    <Layout>
+      {page}
+    </Layout>
   );
 };
 
-export default Warehouses;
+export default Products;

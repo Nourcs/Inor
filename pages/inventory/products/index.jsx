@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
-import Layout from '../../components/Layouts/Layout';
-import InventoryLayout from '../../components/Layouts/Inventory';
+import Layout from '../../../components/Layouts/Layout';
+import InventoryLayout from '../../../components/Layouts/Inventory';
 
-import Table from '../../components/Table/Table';
+import Table from '../../../components/Table/Table';
 
 const data = Array(50)
   .fill(undefined)

@@ -2,23 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
-
 @layer base {
+  button {
+    @apply outline-none;
+  }
+  /* 
   ::-webkit-scrollbar-track {
     position: absolute;
-    background-color: theme('colors.dark.300');
+    background-color: theme("colors.dark.300");
   }
 
   ::-webkit-scrollbar {
     position: absolute;
-    width: 5px;
+    width: 3px;
     height: 3px;
-    background-color: theme('colors.dark.300');
+    background-color: theme("colors.dark.300");
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: theme('colors.dark.500');
-  }
+    background-color: theme("colors.dark.500");
+  } */
 }

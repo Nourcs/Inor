@@ -13,8 +13,8 @@ import Inventory from '../components/Dashboard/Inventory';
 function Dashboard() {
   return (
     <div className="p-5">
-      <div className="flex gap-5">
-        <section className="w-2/3">
+      <div className="flex flex-col lg:flex-row gap-5">
+        <section className="w-full lg:w-2/3">
           <Summary sales={sales} purchases={purchases} />
           <Statistics data={chart} />
         </section>
@@ -22,7 +22,7 @@ function Dashboard() {
           <Activity feed={feed} />
         </section>
       </div>
-      <div className="flex mt-10 gap-5">
+      <div className="flex flex-col lg:flex-row mt-10 gap-5">
         <Products products={products} />
         <Inventory inventory={inventory} />
       </div>

@@ -12,43 +12,52 @@ function Summary({ sales, purchases }) {
   }, [tab]);
 
   return (
-    <>
+    <section id="summary">
       <div className="flex items-end justify-between">
-        <div>
+        <div className="mr-5">
           <button
             onClick={() => setTab('sales')}
             type="button"
             className={`mr-5 text-lg font-extrabold transition duration-100 ease-in-out ${tab === 'sales' ? 'text-main-900' : 'text-dark-400 hover:text-dark-900'}`}
           >
-            Sales
+            <h2>
+              Sales
+            </h2>
           </button>
           <button
             onClick={() => setTab('purchases')}
             type="button"
             className={`text-lg font-extrabold transition duration-100 ease-in-out ${tab === 'purchases' ? 'text-main-900' : 'text-dark-400 hover:text-dark-900'}`}
           >
-            Purchases
+            <h2>
+              Purchases
+            </h2>
           </button>
         </div>
         <Menu filter={filter} setFilter={setFilter} options={duration} />
       </div>
-      <div className="rounded-lg mt-1 flex items-center justify-between gap-[3px]">
+      <div className="rounded-lg mt-1 flex items-stretch justify-between gap-[3px] flex-wrap">
         {data.map((item, index) => (
-          <div key={`data_${index}`} className={`text-dark-900 p-5 bg-dark-100 flex-1 flex flex-col items-center justify-center ${index === 0 && 'rounded-l-lg'} ${index === (data.length - 1) && 'rounded-r-lg'}`}>
+          <section
+            key={`summary_data_${item.value}`}
+            className={`text-dark-900 px-5 py-4 bg-dark-100 w-1/3 sm:w-1/5 grow flex flex-col items-center justify-start ${index === 0 && 'rounded-l-lg'} ${index === (data.length - 1) && 'rounded-r-lg'}`}
+          >
             <div className="text-main-900">
               {item.icon}
             </div>
-            <div className="mt-5 text-2xl font-extrabold">
-              {item.type === 'currency' && '$'}
-              {item.value.toLocaleString(undefined, { minimumFractionDigits: 0 })}
+            <div className="flex flex-col justify-center items-center">
+              <h3 className="mt-5 text-xl font-extrabold">
+                {item.type === 'currency' && '$'}
+                {item.value.toLocaleString(undefined, { minimumFractionDigits: 0 })}
+              </h3>
+              <h4 className="text-sm text-center">
+                {item.name}
+              </h4>
             </div>
-            <div className="text-sm">
-              {item.name}
-            </div>
-          </div>
+          </section>
         ))}
       </div>
-    </>
+    </section>
   );
 }
 

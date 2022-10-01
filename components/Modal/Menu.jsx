@@ -13,7 +13,7 @@ function Menu({
         className="flex items-center justify-center text-sm font-bold group"
         onClick={() => setFilterOpen(!filterOpen)}
       >
-        <span className="mr-2">{filter.label}</span>
+        <span className="mr-2 text-ellipsis overflow-hidden whitespace-nowrap">{filter.label}</span>
         <div className="text-dark-500 group-hover:text-main-900 transition duration-100 ease-in-out">
           <ChevronDown className="h-4 w-4" />
         </div>
