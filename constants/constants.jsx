@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  List, Package, Percent, RefreshCcw, ShoppingCart, Tag, TrendingDown, TrendingUp, Truck, XSquare,
+  Layers, Package, Percent, RefreshCcw, ShoppingCart, Tag, TrendingDown, TrendingUp, Truck, XSquare,
 } from 'react-feather';
 
 export const duration = [
@@ -162,7 +162,7 @@ export const inventory = [
     value: 12,
   },
   {
-    icon: <List className="h-5 w-5" />,
+    icon: <Layers className="h-5 w-5" />,
     name: 'Total Categories',
     value: 3,
   },

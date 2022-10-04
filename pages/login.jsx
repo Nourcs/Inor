@@ -64,7 +64,10 @@ function Login() {
                 adipiscing elit, sed do eiusmod tempor
                 incididunt ut labore et dolore magna aliqua.
               </p>
-              <button type="button" className="mt-5 h-10 bg-white font-semibold text-main-900 flex items-center justify-center rounded-full px-10 text-sm">
+              <button
+                type="button"
+                className="mt-5 h-10 bg-white hover:bg-main-900 transition duration-150 ease-in-out hover:text-white font-semibold text-main-900 flex items-center justify-center rounded-full px-10 text-sm"
+              >
                 Request Demo
               </button>
             </div>

@@ -2,6 +2,7 @@ import '../styles/globals.css';
 import '../styles/index.css';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useState } from 'react';
+import { SnackbarProvider } from 'notistack';
 import { auth } from '../utils/firebase';
 import AppContext from '../context/state';
 
@@ -36,7 +37,17 @@ function MyApp({ Component, pageProps }) {
       user, setUser, loading, setLoading,
     }}
     >
-      {getLayout(<Component {...pageProps} />)}
+      <SnackbarProvider
+        maxSnack={3}
+        autoHideDuration={3000}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+        hideIconVariant
+      >
+        {getLayout(<Component {...pageProps} />)}
+      </SnackbarProvider>
     </AppContext.Provider>
   );
 }

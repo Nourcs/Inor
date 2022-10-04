@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import Layout from '../../components/Layouts/Layout';
 import InventoryLayout from '../../components/Layouts/Inventory';
@@ -45,20 +45,25 @@ const columns = [
   },
 ];
 
-function Products() {
+function Suppliers() {
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       <div className="h-16 shrink-0 flex items-center px-5">
         <InventoryLayout />
       </div>
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Table data={data} columns={columns} />
+      <div className="flex-1 flex flex-col overflow-hidden px-5">
+        <Table
+          showPagination
+          data={data}
+          columns={columns}
+          type={{ label: 'Supplier', key: 'supplier' }}
+        />
       </div>
     </div>
   );
 }
 
-Products.getLayout = function getLayout(page) {
+Suppliers.getLayout = function getLayout(page) {
   return (
     <Layout>
       {page}
@@ -66,4 +71,4 @@ Products.getLayout = function getLayout(page) {
   );
 };
 
-export default Products;
+export default Suppliers;

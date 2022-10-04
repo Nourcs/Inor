@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   LineChart, Line, CartesianGrid, Tooltip, XAxis, ResponsiveContainer,
 } from 'recharts';
@@ -31,7 +31,7 @@ function Statistics({ data }) {
 
   return (
     <section className="mt-10">
-      <div className="flex items-end justify-between">
+      <div className="flex items-center justify-between">
         <h2 className="text-lg font-extrabold mr-5 text-ellipsis overflow-hidden whitespace-nowrap">
           <span className="hidden sm:inline-block">Sales and Purchases</span>
           {' '}

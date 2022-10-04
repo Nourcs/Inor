@@ -124,10 +124,11 @@ function Main({ children }) {
               <img
                 alt="topbar"
                 className="h-10 w-10 object-cover rounded-full mr-3"
-                src={`${user.photoURL}`}
+                src={`${user?.photoURL || ''}`}
+                onError={(e) => e.target.src = 'https://cdn-icons-png.flaticon.com/512/1144/1144709.png'}
               />
               <div className="mr-5 text-left self-center">
-                <h3 className="font-semibold leading-4">{user.displayName}</h3>
+                <h3 className="font-semibold leading-4">{user?.displayName || 'User'}</h3>
                 <h4 className="text-sm text-dark-500 leading-4">CEO</h4>
               </div>
               <div className="text-dark-400 group-hover:text-main-900 transition duration-100 ease-in-out mt-0.5">

@@ -1,26 +1,8 @@
-// import * as React from 'react';
-
-// function SvgComponent(props) {
-//   return (
-//     <svg
-
-//     >
-//       <path
-//         d="M20 40a20.005 20.005 0 0 1-7.785-38.428 20.005 20.005 0 0 1 15.57 36.857A19.875 19.875 0 0 1 20 40Zm-.185-36.3A16.481 16.481 0 1 0 36.3 20.185 16.5 16.5 0 0 0 19.815 3.7Z"
-//         fill="#EAEAEA"
-//       />
-//       <path
-//         d="M40 20h-3.7A16.574 16.574 0 0 0 20 3.705V0a19.983 19.983 0 0 1 20 20Z"
-//         fill="#84a98c"
-//       >
-
-//       </path>
-//     </svg>
-//   );
-// }
-
-// export default SvgComponent;
 import * as React from 'react';
+import resolveConfig from 'tailwindcss/resolveConfig';
+import tailwindConfig from '../tailwind.config';
+
+const tailwind = resolveConfig(tailwindConfig);
 
 function SvgComponent(props) {
   return (
@@ -37,7 +19,7 @@ function SvgComponent(props) {
       />
       <path
         d="M36 20a15.9 15.9 0 0 0-4.691-11.309A15.9 15.9 0 0 0 20 4a2 2 0 1 1 0-4 19.868 19.868 0 0 1 14.142 5.857A19.873 19.873 0 0 1 40 20a2 2 0 1 1-4 0Z"
-        fill="#84a98c"
+        fill={tailwind.theme.colors.main[900]}
       >
         <animateTransform
           attributeType="xml"

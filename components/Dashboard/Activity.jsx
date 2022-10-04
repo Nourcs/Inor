@@ -3,13 +3,13 @@ import { ExternalLink } from 'react-feather';
 
 function Activity({ feed }) {
   return (
-    <section className="mt-5 lg:mt-0">
+    <section className="mt-10">
       <div className="flex items-center justify-between">
         <div className="text-lg font-extrabold">
           <h2>Activity Feed</h2>
         </div>
       </div>
-      <div className="flex-1 bg-dark-100 rounded-lg mt-1 overflow-y-auto h-80 lg:min-h-[432px] lg:max-h-[432px] flex flex-col">
+      <div className="flex-1 bg-dark-100 rounded-lg mt-1 overflow-y-auto h-60 lg:h-96 flex flex-col">
         {feed.map((item) => (
           <button
             key={`activity_${item.timestamp}`}

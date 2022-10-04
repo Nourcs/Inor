@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import Layout from '../../../components/Layouts/Layout';
 import InventoryLayout from '../../../components/Layouts/Inventory';
@@ -51,8 +51,13 @@ function Products() {
       <div className="h-16 shrink-0 flex items-center px-5">
         <InventoryLayout />
       </div>
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Table data={data} columns={columns} />
+      <div className="flex-1 flex flex-col overflow-hidden px-5">
+        <Table
+          showPagination
+          data={data}
+          columns={columns}
+          type={{ label: 'Product', key: 'product' }}
+        />
       </div>
     </div>
   );

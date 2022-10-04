@@ -2,10 +2,12 @@ import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import {
   Check,
-  ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search, Square,
+  ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search,
 } from 'react-feather';
-import { range } from 'lodash';
+import { range, isEmpty } from 'lodash';
 import { CSVLink } from 'react-csv';
+import moment from 'moment';
+import { useSnackbar } from 'notistack';
 
 function Pages({ setPaging, paging }) {
   // Generate Pages
@@ -130,7 +132,11 @@ function PageSize({ paging, setPaging }) {
     </div>
   );
 }
-function Table({ data, columns }) {
+function Table({
+  data, columns, type, showPagination,
+}) {
+  const { enqueueSnackbar } = useSnackbar();
+
   // Paging
   const [paging, setPaging] = useState({
     page: 0,
@@ -142,40 +148,40 @@ function Table({ data, columns }) {
   });
 
   // Sorting
-  const [sorting, setSorting] = useState({
-    filterBy: 'sku',
+  const [sort, setSort] = useState({
+    sortBy: 'sku',
     type: 'initial',
   });
 
-  const handleSorting = (e, filterBy) => {
+  const handleSorting = (e, sortBy) => {
     e.preventDefault();
-    if (sorting.filterBy === filterBy) {
-      if (sorting.type === 'initial') {
-        setSorting({ ...sorting, type: 'ascending' });
-      } else if (sorting.type === 'ascending') {
-        setSorting({ ...sorting, type: 'descending' });
+    if (sort.sortBy === sortBy) {
+      if (sort.type === 'initial') {
+        setSort({ ...sort, type: 'ascending' });
+      } else if (sort.type === 'ascending') {
+        setSort({ ...sort, type: 'descending' });
       } else {
-        setSorting({ ...sorting, type: 'initial' });
+        setSort({ ...sort, type: 'initial' });
       }
     } else {
-      setSorting({ filterBy, type: 'ascending' });
+      setSort({ sortBy, type: 'ascending' });
     }
   };
 
   const sortedData = (a, b) => {
-    if (sorting.type === 'ascending') {
-      if (a.sku < b.sku) {
+    if (sort.type === 'ascending') {
+      if (a[sort.sortBy] < b[sort.sortBy]) {
         return -1;
       }
-      if (a.sku > b.sku) {
+      if (a[sort.sortBy] > b[sort.sortBy]) {
         return 1;
       }
       return 0;
-    } if (sorting.type === 'descending') {
-      if (a.sku > b.sku) {
+    } if (sort.type === 'descending') {
+      if (a[sort.sortBy] > b[sort.sortBy]) {
         return -1;
       }
-      if (a.sku < b.sku) {
+      if (a[sort.sortBy] < b[sort.sortBy]) {
         return 1;
       }
       return 0;
@@ -210,11 +216,11 @@ function Table({ data, columns }) {
     .sort(sortedData)
     .slice((paging.page * paging.pageSize + 1) - 1, paging.pageSize * (paging.page + 1));
 
-  const [filteredData, setSortingedData] = useState(handleFilteredData);
+  const [filteredData, setFilteredData] = useState(handleFilteredData);
 
   // Updates
   useEffect(() => {
-    setSortingedData(handleFilteredData);
+    setFilteredData(handleFilteredData);
     setPaging(
       {
         ...paging,
@@ -228,12 +234,50 @@ function Table({ data, columns }) {
   }, [paging.pageSize, data]);
 
   useEffect(() => {
-    setSortingedData(handleFilteredData);
-  }, [paging.page, sorting]);
+    setFilteredData(handleFilteredData);
+  }, [paging.page, sort]);
+
+  // CSV
+  const generateCSV = () => {
+    const csvHeaders = columns.map((item) => ({ label: item.title, key: item.key }));
+    let csvData = [];
+    if (!isEmpty(selected.elements) && !selected.all) {
+      csvData = [...selected.elements];
+    } else {
+      csvData = [...data];
+    }
+
+    return ({ headers: csvHeaders, data: csvData });
+  };
+
+  // Window Resize
+  const [width, setWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    function handleResize() {
+      setWidth(window.innerWidth);
+    }
+
+    window.addEventListener('resize', handleResize);
+
+    return (_) => {
+      window.removeEventListener('resize', handleResize);
+    };
+  });
+
+  useEffect(() => {
+    if (width < 768 && filteredData.length < data.length) {
+      setPaging({ ...paging, pageSize: data.length });
+    }
+  }, [width, filteredData]);
+
+  console.log('DATA:', filteredData);
 
   return (
     <>
-      <div className="px-5 pb-5 flex items-center justify-between">
+      {/* Search  */}
+      {showPagination && (
+      <section className="pb-5 flex items-center justify-between">
         <div className="border-2 border-dark-300 h-10 rounded-full flex items-center relative flex-1 md:max-w-md sm:mr-3">
           <div className="text-dark-400 absolute left-3">
             <Search className="h-5 w-5" strokeWidth={2.5} />
@@ -245,24 +289,29 @@ function Table({ data, columns }) {
           />
         </div>
         <div className="hidden sm:flex items-center justify-end">
-          <button type="button" className="h-10 px-10 bg-white text-sm font-semibold text-main-900 mr-3 rounded-full hover:bg-main-900 hover:text-white transition duration-150 ease-in-out border-2 border-main-900">
-            <CSVLink
-              data={data}
-                // data={data.map((item) => Object.values(item))}
-                // headers={columns.map((item) => item.title)}
-              headers={columns.map((item) => ({ label: item.title, key: item.key }))}
-              filename="today"
-            >
-              Export CSV
-            </CSVLink>
-          </button>
+          <CSVLink
+            className="h-10 flex items-center mr-3 justify-center px-10 bg-white text-sm font-semibold text-main-900 rounded-full hover:bg-main-900 hover:text-white transition duration-150 ease-in-out border-2 border-main-900"
+            onClick={() => enqueueSnackbar('CSV File Downloaded Successfully.', { variant: 'success', preventDuplicate: true })}
+            data={generateCSV().data}
+            headers={generateCSV().headers}
+            filename={(`${type.key === 'product' && 'Products-'}${moment().format('MMM-DD-YYYY')}`).toLocaleLowerCase()}
+          >
+            Export
+            {' '}
+            {!isEmpty(selected.elements) && !selected.all ? 'Selected' : 'All'}
+          </CSVLink>
           <button type="button" className="shrink-0 h-10 px-10 bg-main-900 text-sm font-semibold text-white rounded-full hover:bg-dark-900 transition duration-150 ease-in-out border-2 border-main-900 hover:border-dark-900">
-            Add Product
+            {selected.elements.length === 1
+              ? 'Duplicate' : 'Add'}
+            {' '}
+            {type && type.label ? type.label : 'New'}
           </button>
         </div>
-      </div>
-      <div
-        className="flex-1 overflow-auto px-5 pb-5 flex"
+      </section>
+      )}
+      {/* Table  */}
+      <section
+        className={`flex-1 overflow-auto flex ${showPagination && 'pb-5'}`}
       >
         <div className="bg-dark-100 rounded-md w-full overflow-auto">
           <table className="table-fixed border-collapse w-full text-sm">
@@ -273,7 +322,7 @@ function Table({ data, columns }) {
               <tr>
                 {columns.map((item) => (
                   <th
-                    className={`first:pl-5 px-3 last:pr-5 ${item.key === 'sku' && 'sticky left-0 top-0 bg-main-900 z-20'}`}
+                    className={`${item.key === 'sku' ? 'sticky left-0 top-0 bg-main-900 z-20 pr-3' : 'px-3'}`}
                     id={item.key}
                   >
                     <div className="flex items-center">
@@ -284,9 +333,11 @@ function Table({ data, columns }) {
                             setSelected({ elements: selected.all ? [] : [...data], all: !selected.all });
                           }}
                           type="button"
-                          className="mr-2 -mt-[1px]"
+                          className="px-5 -mt-[1px] h-12 group"
                         >
-                          <div className={`h-[15px] w-[15px] border-2 flex items-center justify-center rounded-sm  transition duration-150 ease-in-out ${selected.all ? 'bg-white border-white' : 'border-white border-opacity-30 hover:border-opacity-100'}`}>
+                          <div
+                            className={`h-[15px] w-[15px] border-2 flex items-center justify-center rounded-sm transition duration-150 ease-in-out ${selected.all ? 'bg-white border-white' : 'border-white border-opacity-30 group-hover:border-opacity-100'}`}
+                          >
                             {selected.all && (
                             <div>
                               <Check className="text-main-900 h-3 w-3" strokeWidth={3} />
@@ -305,12 +356,12 @@ function Table({ data, columns }) {
                         </span>
                         <div className="">
                           <div
-                            className={`opacity-30 group-hover:opacity-100 transition duration-150 ease-in-out ${sorting.filterBy === item.key && sorting.type === 'descending' && 'invisible'} ${sorting.filterBy === item.key && sorting.type === 'ascending' && 'opacity-100'}`}
+                            className={`opacity-30 group-hover:opacity-100 transition duration-150 ease-in-out ${sort.sortBy === item.key && sort.type === 'descending' && 'invisible'} ${sort.sortBy === item.key && sort.type === 'ascending' && 'opacity-100'}`}
                           >
                             <ChevronUp className="h-3 w-3" strokeWidth={2.5} />
                           </div>
                           <div
-                            className={`-mt-1 opacity-30 group-hover:opacity-100 transition duration-150 ease-in-out ${sorting.filterBy === item.key && sorting.type === 'ascending' && 'invisible'} ${sorting.filterBy === item.key && sorting.type === 'ascending' && 'opacity-100'}`}
+                            className={`-mt-1 opacity-30 group-hover:opacity-100 transition duration-150 ease-in-out ${sort.sortBy === item.key && sort.type === 'ascending' && 'invisible'} ${sort.sortBy === item.key && sort.type === 'ascending' && 'opacity-100'}`}
                           >
                             <ChevronDown className="h-3 w-3" strokeWidth={2.5} />
                           </div>
@@ -326,15 +377,17 @@ function Table({ data, columns }) {
                 <Link href={`products/${item.sku}`}>
                   <tr className="border-b border-dark-200 hover:bg-dark-200 cursor-pointer group">
                     {Object.keys(item).map((el) => (
-                      <td className={`px-5 h-14 ${el === 'sku' && 'sticky left-0 bg-dark-100 group-hover:bg-dark-200'}`}>
+                      <td className={`h-14 ${el === 'sku' ? 'sticky left-0 bg-dark-100 group-hover:bg-dark-200 pr-3' : 'px-3'}`}>
                         <div className="flex items-center">
                           {el === 'sku' && (
                             <button
                               onClick={(e) => handleSelection(e, item)}
                               type="button"
-                              className="mr-2 -mt-[1px]"
+                              className="px-5 -mt-[1px] h-14"
                             >
-                              <div className={`h-[15px] w-[15px] border-2 flex items-center justify-center rounded-sm  transition duration-150 ease-in-out ${selected.elements.includes(item) ? 'bg-main-900 border-main-900' : 'border-dark-300 hover:border-main-900'}`}>
+                              <div
+                                className={`h-[15px] w-[15px] border-2 flex items-center justify-center rounded-sm  transition duration-150 ease-in-out ${selected.elements.includes(item) ? 'bg-main-900 border-main-900' : 'border-dark-300 hover:border-main-900'}`}
+                              >
                                 {selected.elements.includes(item) && (
                                 <div>
                                   <Check className="text-dark-100 h-3 w-3" strokeWidth={3} />
@@ -353,13 +406,29 @@ function Table({ data, columns }) {
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
       {/* Pagination */}
-      <div className="h-16 shrink-0 border-t border-dark-300 flex items-center px-5 justify-between text-sm">
-        <Results paging={paging} />
+      {showPagination && (
+      <section className="-mx-5 h-16 shrink-0 border-t border-dark-300 flex items-center px-5 justify-between text-sm">
+        {(isEmpty(selected.elements)) ? (<Results paging={paging} />)
+          : (
+            <div className="flex-1 flex items-center">
+              <button
+                type="button"
+                className="border-2 border-main-900 h-10 px-5 rounded-full text-sm font-semibold text-main-900 hover:bg-main-900 hover:text-white transition duration-150 ease-in-out"
+              >
+                Delete
+                {' '}
+                <span className="">{selected.all ? 'All' : 'Selected'}</span>
+              </button>
+
+            </div>
+          )}
         {paging.pages > 1 && (<Pages paging={paging} setPaging={setPaging} />)}
         <PageSize paging={paging} setPaging={setPaging} />
-      </div>
+
+      </section>
+      )}
     </>
   );
 }
