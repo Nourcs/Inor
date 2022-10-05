@@ -11,7 +11,7 @@ const data = Array(50)
     sku: `${index + 1}`,
     name: `Name: ${index + 1}`,
     category: `Category: ${index + 1}`,
-    supplier: `Supplier:${index + 1}`,
+    supplier: `Supplier: ${index + 1}`,
     warehouse: `Warehouse: ${index + 1}`,
     quantity: `Quantity: ${index + 1}`,
     price: `Price: ${index + 1}`,

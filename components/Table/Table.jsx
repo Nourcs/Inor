@@ -136,6 +136,7 @@ function Table({
   data, columns, type, showPagination,
 }) {
   const { enqueueSnackbar } = useSnackbar();
+  const [search, setSearch] = useState('');
 
   // Paging
   const [paging, setPaging] = useState({
@@ -213,6 +214,15 @@ function Table({
 
   // Handle Data
   const handleFilteredData = [...data]
+    .filter((item) => {
+      let valid = false;
+      Object.keys(item).map((el) => {
+        if (item[el].toLowerCase().includes(search.toLowerCase())) {
+          valid = true;
+        }
+      });
+      return valid;
+    })
     .sort(sortedData)
     .slice((paging.page * paging.pageSize + 1) - 1, paging.pageSize * (paging.page + 1));
 
@@ -231,11 +241,11 @@ function Table({
           .filter((_, index) => (index + 1) % 5 === 0 || index === (data.length - 1)),
       },
     );
-  }, [paging.pageSize, data]);
+  }, [paging.pageSize, data, search]);
 
   useEffect(() => {
     setFilteredData(handleFilteredData);
-  }, [paging.page, sort]);
+  }, [paging.page, sort, search]);
 
   // CSV
   const generateCSV = () => {
@@ -271,8 +281,6 @@ function Table({
     }
   }, [width, filteredData]);
 
-  console.log('DATA:', filteredData);
-
   return (
     <>
       {/* Search  */}
@@ -283,6 +291,8 @@ function Table({
             <Search className="h-5 w-5" strokeWidth={2.5} />
           </div>
           <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             type="text"
             placeholder="Search"
             className="placeholder:text-dark-400 outline-none font-semibold w-full h-full bg-transparent pl-10 pr-3"
@@ -376,10 +386,14 @@ function Table({
               {filteredData.map((item) => (
                 <Link href={`products/${item.sku}`}>
                   <tr className="border-b border-dark-200 hover:bg-dark-200 cursor-pointer group">
-                    {Object.keys(item).map((el) => (
-                      <td className={`h-14 ${el === 'sku' ? 'sticky left-0 bg-dark-100 group-hover:bg-dark-200 pr-3' : 'px-3'}`}>
-                        <div className="flex items-center">
-                          {el === 'sku' && (
+                    {Object.keys(item).map((el) => {
+                      const index = item[el].toLowerCase().indexOf(search.toLowerCase());
+                      const matched = (item[el].toLowerCase().includes(search.toLowerCase()) && search) ? [item[el].slice(0, index), item[el].slice(index, index + search.length), item[el].slice(index + search.length, item[el].length)].filter((i) => i.length > 0) : [item[el]];
+                      console.log('ASba', matched);
+                      return (
+                        <td className={`h-14 ${el === 'sku' ? 'sticky left-0 bg-dark-100 group-hover:bg-dark-200 pr-3' : 'px-3'}`}>
+                          <div className="flex items-center">
+                            {el === 'sku' && (
                             <button
                               onClick={(e) => handleSelection(e, item)}
                               type="button"
@@ -395,11 +409,20 @@ function Table({
                                 )}
                               </div>
                             </button>
-                          )}
-                          {item[el]}
-                        </div>
-                      </td>
-                    ))}
+                            )}
+                            {matched.map((element) => {
+                              const nu = null;
+                              return (
+                                <span className={`${element.toLowerCase() === search.toLowerCase() && 'font-semibold text-main-900'}`}>{element}</span>
+                              );
+                            })}
+                            {/* <span className={`${search && item[el].toLowerCase().includes(search.toLowerCase()) && 'font-semibold text-main-900'}`}>
+                              {item[el]}
+                            </span> */}
+                          </div>
+                        </td>
+                      );
+                    })}
                   </tr>
                 </Link>
               ))}
