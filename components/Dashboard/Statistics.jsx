@@ -9,6 +9,22 @@ import tailwindConfig from '../../tailwind.config';
 
 const tailwind = resolveConfig(tailwindConfig);
 
+function Legend() {
+  return (
+    <>
+      {' '}
+      <div className="flex items-center justify-center text-sm font-semibold mr-5">
+        <div className="h-2 w-2 bg-main-900 rounded-full mr-2" />
+        <h6>Sales</h6>
+      </div>
+      <div className="flex items-center justify-center text-sm font-semibold ">
+        <div className="h-2 w-2 bg-dark-400 rounded-full mr-2" />
+        <h6>Purchases</h6>
+      </div>
+    </>
+  );
+}
+
 function ActiveDot(props) {
   const {
     cx, cy, color,
@@ -33,24 +49,16 @@ function Statistics({ data }) {
     <section className="mt-10">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-extrabold mr-5 text-ellipsis overflow-hidden whitespace-nowrap">
-          <span className="hidden sm:inline-block">Sales and Purchases</span>
-          {' '}
-          Statistics
+          Sales and Purchases Statistics
         </h2>
         <div className="flex items-center">
-          <div className="flex items-center justify-center text-sm font-semibold mr-3">
-            <div className="h-2 w-2 bg-main-900 rounded-full mr-2" />
-            <h6>Sales</h6>
-          </div>
-          <div className="flex items-center justify-center text-sm font-semibold ">
-            <div className="h-2 w-2 bg-dark-400 rounded-full mr-2" />
-            <h6>Purchases</h6>
-          </div>
-          <div className="h-5 border-l border-dark-300 mx-3" />
           <Menu filter={filter} setFilter={setFilter} options={duration} />
         </div>
       </div>
       <div className={`mt-1 py-5 px-2 bg-dark-100 rounded-lg ${data.length === 0 && 'animate-pulse h-[240px]'}`}>
+        <div className="flex mb-5 items-center justify-center">
+          <Legend />
+        </div>
         {data.length > 0 && (
         <ResponsiveContainer width="100%" height={200}>
           <LineChart

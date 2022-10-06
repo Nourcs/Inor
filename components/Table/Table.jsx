@@ -8,6 +8,7 @@ import { range, isEmpty } from 'lodash';
 import { CSVLink } from 'react-csv';
 import moment from 'moment';
 import { useSnackbar } from 'notistack';
+import { Add } from '../../public/illustrations';
 
 function Pages({ setPaging, paging }) {
   // Generate Pages
@@ -285,8 +286,9 @@ function Table({
     <>
       {/* Search  */}
       {showPagination && (
-      <section className="pb-5 flex items-center justify-between">
-        <div className="border-2 border-dark-300 h-10 rounded-full flex items-center relative flex-1 md:max-w-md sm:mr-3">
+      <section className={`pb-5 flex items-center ${data.length > 0 ? 'justify-between' : 'justify-end'}`}>
+        {data.length > 0 && (
+        <div className="border-2 border-dark-300 h-10 rounded-full flex items-center relative flex-1 md:max-w-md mr-3">
           <div className="text-dark-400 absolute left-3">
             <Search className="h-5 w-5" strokeWidth={2.5} />
           </div>
@@ -298,9 +300,11 @@ function Table({
             className="placeholder:text-dark-400 outline-none font-semibold w-full h-full bg-transparent pl-10 pr-3"
           />
         </div>
-        <div className="hidden sm:flex items-center justify-end">
+        )}
+        <div className={`flex items-center justify-end ${data.length === 0 && 'w-full'}`}>
+          {data.length > 0 && (
           <CSVLink
-            className="h-10 flex items-center mr-3 justify-center px-10 bg-white text-sm font-semibold text-main-900 rounded-full hover:bg-main-900 hover:text-white transition duration-150 ease-in-out border-2 border-main-900"
+            className="h-10 hidden sm:flex items-center mr-3 justify-center px-10 bg-white text-sm font-semibold text-main-900 rounded-full hover:bg-main-900 hover:text-white transition duration-150 ease-in-out border-2 border-main-900"
             onClick={() => enqueueSnackbar('CSV File Downloaded Successfully.', { variant: 'success', preventDuplicate: true })}
             data={generateCSV().data}
             headers={generateCSV().headers}
@@ -310,11 +314,15 @@ function Table({
             {' '}
             {!isEmpty(selected.elements) && !selected.all ? 'Selected' : 'All'}
           </CSVLink>
-          <button type="button" className="shrink-0 h-10 px-10 bg-main-900 text-sm font-semibold text-white rounded-full hover:bg-dark-900 transition duration-150 ease-in-out border-2 border-main-900 hover:border-dark-900">
+          )}
+          <button
+            type="button"
+            className={`shrink-0 h-10 px-10 bg-main-900 text-sm font-semibold text-white rounded-full hover:bg-dark-900 transition duration-150 ease-in-out border-2 border-main-900 hover:border-dark-900 ${data.length === 0 && 'w-full md:w-auto'}`}
+          >
             {selected.elements.length === 1
               ? 'Duplicate' : 'Add'}
             {' '}
-            {type && type.label ? type.label : 'New'}
+            <span className={`${data.length > 0 && 'hidden md:block'}`}>{type.label}</span>
           </button>
         </div>
       </section>
@@ -324,19 +332,20 @@ function Table({
         className={`flex-1 overflow-auto flex ${showPagination && 'pb-5'}`}
       >
         <div className="bg-dark-100 rounded-md w-full overflow-auto">
-          <table className="table-fixed border-collapse w-full text-sm">
-            <colgroup>
-              {columns.map((item) => <col width={item.width} />)}
-            </colgroup>
-            <thead className="bg-main-900 text-left h-12 rounded-md sticky top-0 text-dark-100 z-10">
-              <tr>
-                {columns.map((item) => (
-                  <th
-                    className={`${item.key === 'sku' ? 'sticky left-0 top-0 bg-main-900 z-20 pr-3' : 'px-3'}`}
-                    id={item.key}
-                  >
-                    <div className="flex items-center">
-                      {item.key === 'sku' && (
+          {data.length > 0 ? (
+            <table className="table-fixed border-collapse w-full text-sm">
+              <colgroup>
+                {columns.map((item) => <col width={item.width} />)}
+              </colgroup>
+              <thead className="bg-main-900 text-left h-12 rounded-md sticky top-0 text-dark-100 z-10">
+                <tr>
+                  {columns.map((item) => (
+                    <th
+                      className={`${item.key === 'sku' ? 'sticky left-0 top-0 bg-main-900 z-20 pr-3' : 'px-3'}`}
+                      id={item.key}
+                    >
+                      <div className="flex items-center">
+                        {item.key === 'sku' && (
                         <button
                           onClick={(e) => {
                             e.preventDefault();
@@ -355,83 +364,93 @@ function Table({
                             )}
                           </div>
                         </button>
-                      )}
-                      <button
-                        type="button"
-                        className="group h-12 w-full text-left flex items-center "
-                        onClick={(e) => handleSorting(e, item.key)}
-                      >
-                        <span className="mr-5">
-                          {item.title}
-                        </span>
-                        <div className="">
-                          <div
-                            className={`opacity-30 group-hover:opacity-100 transition duration-150 ease-in-out ${sort.sortBy === item.key && sort.type === 'descending' && 'invisible'} ${sort.sortBy === item.key && sort.type === 'ascending' && 'opacity-100'}`}
-                          >
-                            <ChevronUp className="h-3 w-3" strokeWidth={2.5} />
-                          </div>
-                          <div
-                            className={`-mt-1 opacity-30 group-hover:opacity-100 transition duration-150 ease-in-out ${sort.sortBy === item.key && sort.type === 'ascending' && 'invisible'} ${sort.sortBy === item.key && sort.type === 'ascending' && 'opacity-100'}`}
-                          >
-                            <ChevronDown className="h-3 w-3" strokeWidth={2.5} />
-                          </div>
-                        </div>
-                      </button>
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredData.map((item) => (
-                <Link href={`products/${item.sku}`}>
-                  <tr className="border-b border-dark-200 hover:bg-dark-200 cursor-pointer group">
-                    {Object.keys(item).map((el) => {
-                      const index = item[el].toLowerCase().indexOf(search.toLowerCase());
-                      const matched = (item[el].toLowerCase().includes(search.toLowerCase()) && search) ? [item[el].slice(0, index), item[el].slice(index, index + search.length), item[el].slice(index + search.length, item[el].length)].filter((i) => i.length > 0) : [item[el]];
-                      console.log('ASba', matched);
-                      return (
-                        <td className={`h-14 ${el === 'sku' ? 'sticky left-0 bg-dark-100 group-hover:bg-dark-200 pr-3' : 'px-3'}`}>
-                          <div className="flex items-center">
-                            {el === 'sku' && (
-                            <button
-                              onClick={(e) => handleSelection(e, item)}
-                              type="button"
-                              className="px-5 -mt-[1px] h-14"
+                        )}
+                        <button
+                          type="button"
+                          className="group h-12 w-full text-left flex items-center "
+                          onClick={(e) => handleSorting(e, item.key)}
+                        >
+                          <span className="mr-5">
+                            {item.title}
+                          </span>
+                          <div className="">
+                            <div
+                              className={`opacity-30 group-hover:opacity-100 transition duration-150 ease-in-out ${sort.sortBy === item.key && sort.type === 'descending' && 'invisible'} ${sort.sortBy === item.key && sort.type === 'ascending' && 'opacity-100'}`}
                             >
-                              <div
-                                className={`h-[15px] w-[15px] border-2 flex items-center justify-center rounded-sm  transition duration-150 ease-in-out ${selected.elements.includes(item) ? 'bg-main-900 border-main-900' : 'border-dark-300 hover:border-main-900'}`}
-                              >
-                                {selected.elements.includes(item) && (
-                                <div>
-                                  <Check className="text-dark-100 h-3 w-3" strokeWidth={3} />
-                                </div>
-                                )}
-                              </div>
-                            </button>
-                            )}
-                            {matched.map((element) => {
-                              const nu = null;
-                              return (
-                                <span className={`${element.toLowerCase() === search.toLowerCase() && 'font-semibold text-main-900'}`}>{element}</span>
-                              );
-                            })}
-                            {/* <span className={`${search && item[el].toLowerCase().includes(search.toLowerCase()) && 'font-semibold text-main-900'}`}>
-                              {item[el]}
-                            </span> */}
+                              <ChevronUp className="h-3 w-3" strokeWidth={2.5} />
+                            </div>
+                            <div
+                              className={`-mt-1 opacity-30 group-hover:opacity-100 transition duration-150 ease-in-out ${sort.sortBy === item.key && sort.type === 'ascending' && 'invisible'} ${sort.sortBy === item.key && sort.type === 'ascending' && 'opacity-100'}`}
+                            >
+                              <ChevronDown className="h-3 w-3" strokeWidth={2.5} />
+                            </div>
                           </div>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                </Link>
-              ))}
-            </tbody>
-          </table>
+                        </button>
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filteredData.map((item) => (
+                  <Link href={`products/${item.sku}`}>
+                    <tr className="border-b border-dark-200 hover:bg-dark-200 cursor-pointer group">
+                      {Object.keys(item).map((el) => {
+                        const searchIndex = item[el].toLowerCase().indexOf(search.toLowerCase());
+                        const matchedSearch = (item[el].toLowerCase().includes(search.toLowerCase()) && search) ? [item[el].slice(0, searchIndex), item[el].slice(searchIndex, searchIndex + search.length), item[el].slice(searchIndex + search.length, item[el].length)].filter((i) => i.length > 0) : [item[el]];
+                        return (
+                          <td className={`h-14 ${el === 'sku' ? 'sticky left-0 bg-dark-100 group-hover:bg-dark-200 pr-3' : 'px-3'}`}>
+                            <div className="flex items-center">
+                              {el === 'sku' && (
+                              <button
+                                onClick={(e) => handleSelection(e, item)}
+                                type="button"
+                                className="px-5 -mt-[1px] h-14"
+                              >
+                                <div
+                                  className={`h-[15px] w-[15px] border-2 flex items-center justify-center rounded-sm  transition duration-150 ease-in-out ${selected.elements.includes(item) ? 'bg-main-900 border-main-900' : 'border-dark-300 hover:border-main-900'}`}
+                                >
+                                  {selected.elements.includes(item) && (
+                                  <div>
+                                    <Check className="text-dark-100 h-3 w-3" strokeWidth={3} />
+                                  </div>
+                                  )}
+                                </div>
+                              </button>
+                              )}
+                              {matchedSearch.map((element) => {
+                                const nu = null;
+                                return (
+                                  <span className={`whitespace-pre ${element.toLowerCase() === search.toLowerCase() && 'font-semibold text-main-900'}`}>{element}</span>
+                                );
+                              })}
+                            </div>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  </Link>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="p-5 h-full flex items-center justify-center">
+              <div>
+                <Add className="h-52" />
+                <h6 className="mt-10">
+                  You don't have any
+                  {' '}
+                  {type.keyP}
+                  {' '}
+                  yet.
+                </h6>
+              </div>
+            </div>
+          )}
         </div>
       </section>
       {/* Pagination */}
-      {showPagination && (
+      {data.length > 0 && showPagination && (
       <section className="-mx-5 h-16 shrink-0 border-t border-dark-300 flex items-center px-5 justify-between text-sm">
         {(isEmpty(selected.elements)) ? (<Results paging={paging} />)
           : (

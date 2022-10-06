@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import {
-  Bell, ChevronDown, File, Layout, Package, Power, ShoppingCart, Tag, Users,
+  Bell, ChevronDown, File, Layout, Menu, Package, Power, ShoppingCart, Tag, Users,
 } from 'react-feather';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -96,7 +96,17 @@ function Main({ children }) {
           </button>
         </div>
         <div className="flex-1 flex flex-col shrink overflow-hidden">
-          <div className="py-5 shrink-0 flex items-stretch px-5 border-b border-dark-300 ">
+          <div className="py-5 shrink-0 flex sm:hidden items-stretch justify-between px-5 border-b border-dark-300 ">
+            <Link href="/" passHref>
+              <a href="#1" className="text-main-900 font-semibold text-lg">
+                Inor
+              </a>
+            </Link>
+            <button type="button" className="text-dark-400 hover:text-main-900 transition duration-150 ease-in-out">
+              <Menu className="h-5 w-5" />
+            </button>
+          </div>
+          <div className="py-5 shrink-0 hidden sm:flex items-stretch px-5 border-b border-dark-300 ">
             <div className="flex-1 items-center justify-end md:justify-between flex">
               <div className="text-dark-500 hidden md:block">
                 Your free trial expires in

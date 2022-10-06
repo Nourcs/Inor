@@ -5,7 +5,7 @@ import InventoryLayout from '../../../components/Layouts/Inventory';
 
 import Table from '../../../components/Table/Table';
 
-const data = Array(50)
+const data = Array(0)
   .fill(undefined)
   .map((_, index) => ({
     sku: `${index + 1}`,
@@ -56,7 +56,9 @@ function Products() {
           showPagination
           data={data}
           columns={columns}
-          type={{ label: 'Product', key: 'product' }}
+          type={{
+            label: 'Product', key: 'product', labelP: 'Products', keyP: 'products',
+          }}
         />
       </div>
     </div>

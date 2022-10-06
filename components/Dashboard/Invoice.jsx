@@ -6,7 +6,7 @@ function NewInvoice() {
     <section className="flex flex-col flex-1" id="new-invoice">
       <div className="flex items-center justify-between">
         <div className="text-lg font-extrabold">
-          <h2>New Invoice</h2>
+          <h2>Create New Invoice</h2>
         </div>
       </div>
       <div className="flex gap-3 flex-1 mt-1">
