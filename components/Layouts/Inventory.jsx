@@ -15,20 +15,21 @@ const NAVIGATION = [
 function InventoryLayout() {
   const { pathname } = useRouter();
   return (
-    <>
-      {NAVIGATION.map((item) => (
-        <Link href={`${item.value}`}>
-          <button type="button" className={`mr-5 text-lg font-extrabold ${pathname.includes(item.value) ? 'text-main-900' : 'text-dark-400 hover:text-dark-900'} transition duration-150 ease-in-out`}>
-            <div className={`${pathname.includes(item.value) ? 'hidden' : ''} sm:hidden`}>
-              {item.icon}
-            </div>
-            <h2 className={`${pathname.includes(item.value) ? '' : 'hidden'} sm:block`}>
-              {item.label}
-            </h2>
-          </button>
-        </Link>
-      ))}
-    </>
+    <div className="flex items-center w-full sm:w-auto">
+      <div className="sm:hidden w-5 h-7 absolute bg-gradient-to-r from-white bg-transparent" />
+      <div className="sm:hidden w-5 h-7 absolute right-0 mr-5 bg-gradient-to-l from-white bg-transparent isolate" />
+      <div className="overflow-scroll flex scrollbar-hidden">
+        {NAVIGATION.map((item) => (
+          <Link href={`${item.value}`}>
+            <button type="button" className={`mr-5 text-lg font-extrabold ${pathname.includes(item.value) ? 'text-main-900' : 'text-dark-400 hover:text-dark-900'} transition duration-150 ease-in-out`}>
+              <h2>
+                {item.label}
+              </h2>
+            </button>
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }
 

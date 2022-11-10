@@ -1,51 +1,66 @@
-import React from 'react';
+import React, { useState } from 'react';
 
+import { Package } from 'react-feather';
 import Layout from '../../../components/Layouts/Layout';
 import InventoryLayout from '../../../components/Layouts/Inventory';
-
+import Modal from '../../../components/Modal/Modal';
 import Table from '../../../components/Table/Table';
+import AddProduct from '../../../components/Inventory/AddProduct';
 
-const data = Array(0)
-  .fill(undefined)
-  .map((_, index) => ({
-    sku: `${index + 1}`,
-    name: `Name: ${index + 1}`,
-    category: `Category: ${index + 1}`,
-    supplier: `Supplier: ${index + 1}`,
-    warehouse: `Warehouse: ${index + 1}`,
-    quantity: `Quantity: ${index + 1}`,
-    price: `Price: ${index + 1}`,
-    sales: `Sales: ${index + 1}`,
-  }));
+const data = [
+  {
+    id: 'd47d00f064c24f55a778b26512377f12', sku: 'snshnimi', name: 'Sneakers', category: 'Shoes', supplier: 'Nike', warehouse: 'Miami', quantity: 15, price: 29.99, sales: 0,
+  },
+  {
+    id: '4e27880b91744da28ddb163fc90e43f0', sku: 'eaacshmi', name: 'Earrings', category: 'Accessories', supplier: 'Shiva', warehouse: 'Miami', quantity: 20, price: 59.99, sales: 15,
+  },
+  {
+    id: '99d7fb50a8c54365a17118f5602dca45', sku: 'tsaphmmi', name: 'T-Shirt', category: 'Apparel', supplier: 'H&M', warehouse: 'Miami', quantity: 20, price: 19.99, sales: 12,
+  },
+  {
+    id: 'db2b4edc0b384537838fa96baa7af47c', sku: 'tbbazata', name: 'Tote Bag', category: 'Bags', supplier: 'ZARA', warehouse: 'Tampa', quantity: 300, price: 29.99, sales: 55,
+  },
+  {
+    id: '58ed4caaecc44bf0ac0f79212746e833', sku: 'hbbashmi', name: 'Hand Bag', category: 'Bags', supplier: 'Shiva', warehouse: 'Miami', quantity: 10, price: 249.99, sales: 73,
+  },
+  {
+    id: '8123f4951a854caa8d39afd7237787c1', sku: 'coaphmmi', name: 'Coat', category: 'Apparel', supplier: 'H&M', warehouse: 'Miami', quantity: 0, price: 129.99, sales: 300,
+  },
+  {
+    id: '6379cbc6d77547c582e0a0dee50080ff', sku: 'puapzami', name: 'Pullover', category: 'Apparel', supplier: 'ZARA', warehouse: 'Miami', quantity: 4, price: 39.99, sales: 20,
+  },
+];
 
 const columns = [
   {
-    key: 'sku', title: 'SKU', width: 175,
+    key: 'sku', label: 'SKU',
   },
   {
-    key: 'name', title: 'Name', width: 200,
+    key: 'name', label: 'Name',
   },
   {
-    key: 'category', title: 'Category', width: 175,
+    key: 'category', label: 'Category',
   },
   {
-    key: 'supplier', title: 'Supplier', width: 175,
+    key: 'supplier', label: 'Supplier',
   },
   {
-    key: 'warehouse', title: 'Warehouse', width: 175,
+    key: 'warehouse', label: 'Warehouse',
   },
   {
-    key: 'quantity', title: 'Quantity', width: 175,
+    key: 'quantity', label: 'Quantity',
   },
   {
-    key: 'price', title: 'Price', width: 175,
+    key: 'price', label: 'Price',
   },
   {
-    key: 'sales', title: 'Sales', width: 175,
+    key: 'sales', label: 'Sales',
   },
 ];
 
 function Products() {
+  const [showModal, setShowModal] = useState(false);
+
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       <div className="h-16 shrink-0 flex items-center px-5">
@@ -53,14 +68,27 @@ function Products() {
       </div>
       <div className="flex-1 flex flex-col overflow-hidden px-5">
         <Table
-          showPagination
+          showModal={(e) => setShowModal(true)}
+          sticky="sku"
+          selection
+          pagination
+          sort
+          search
           data={data}
           columns={columns}
-          type={{
-            label: 'Product', key: 'product', labelP: 'Products', keyP: 'products',
+          dataType={{
+            label: { s: 'Product', p: 'Products' }, key: { s: 'product', p: 'products' },
           }}
         />
       </div>
+      <Modal
+        icon={<Package className="h-5 w-5" />}
+        open={showModal}
+        close={() => setShowModal(false)}
+        title="Add Product"
+      >
+        <AddProduct />
+      </Modal>
     </div>
   );
 }

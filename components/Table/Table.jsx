@@ -2,27 +2,32 @@ import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import {
   Check,
-  ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Search,
+  ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Grid, Minus, Search,
 } from 'react-feather';
 import { range, isEmpty } from 'lodash';
 import { CSVLink } from 'react-csv';
 import moment from 'moment';
 import { useSnackbar } from 'notistack';
-import { Add } from '../../public/illustrations';
+import { Add, Void } from '../../public/illustrations';
+import Columns from '../Modal/Columns';
 
-function Pages({ setPaging, paging }) {
+// Pages Navigation
+function PagesNavigation({
+  setPagination,
+  pagination,
+  pagination: { totalPages, pageIndex },
+}) {
   // Generate Pages
   const generatePages = () => {
-    // const pagesArr = paging.pages > 5 ? (paging.page < 3 ? range(1, 4) : (paging.page > paging.pages - 3 ? range(paging.pages - 4, paging.pages - 1) : range(paging.page - 1, paging.page + 2))) : range(1, paging.pages);
-    if (paging.pages > 5) {
-      if (paging.page < 3) {
+    if (totalPages > 5) {
+      if (pageIndex < 3) {
         return range(1, 4);
-      } if (paging.page > paging.pages - 3) {
-        return range(paging.pages - 4, paging.pages - 1);
+      } if (pageIndex > totalPages - 3) {
+        return range(totalPages - 4, totalPages - 1);
       }
-      return range(paging.page - 1, paging.page + 2);
+      return range(pageIndex - 1, pageIndex + 2);
     }
-    return range(1, paging.pages);
+    return range(1, totalPages);
   };
 
   const pagesArr = generatePages();
@@ -32,8 +37,8 @@ function Pages({ setPaging, paging }) {
       <button
         type="button"
         className="mr-3 h-8 w-8 items-center justify-center font-semibold text-dark-300 hover:text-main-900 transition duration-150 ease-in-out flex"
-        onClick={() => setPaging(
-          { ...paging, page: paging.page > 0 ? paging.page - 1 : paging.page },
+        onClick={() => setPagination(
+          { ...pagination, pageIndex: pageIndex > 0 ? pageIndex - 1 : pageIndex },
         )}
       >
         <div>
@@ -42,13 +47,13 @@ function Pages({ setPaging, paging }) {
       </button>
       <div className="flex">
         <button
-          onClick={() => setPaging({ ...paging, page: 0 })}
+          onClick={() => setPagination({ ...pagination, pageIndex: 0 })}
           type="button"
-          className={`mr-3 ${paging.page === 0 ? 'bg-main-900' : 'bg-dark-200 hover:bg-main-900 '} transition duration-150 ease-in-out h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-semibold`}
+          className={`mr-3 ${pageIndex === 0 ? 'bg-main-900' : 'bg-dark-200 hover:bg-main-900 '} transition duration-150 ease-in-out h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-semibold`}
         >
           1
         </button>
-        {paging.pages > 5 && paging.page > 1 && (
+        {totalPages > 5 && pageIndex > 1 && (
         <span className="mr-3 text-dark-300">
           ...
         </span>
@@ -56,33 +61,33 @@ function Pages({ setPaging, paging }) {
       </div>
       {pagesArr.map((item) => (
         <button
-          onClick={() => setPaging({ ...paging, page: item })}
+          onClick={() => setPagination({ ...pagination, pageIndex: item })}
           type="button"
-          className={`${paging.page === item ? 'bg-main-900' : 'bg-dark-200 hover:bg-main-900 '} transition duration-150 ease-in-out h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-semibold mr-3`}
+          className={`${pageIndex === item ? 'bg-main-900' : 'bg-dark-200 hover:bg-main-900 '} transition duration-150 ease-in-out h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-semibold mr-3`}
         >
           {item + 1}
         </button>
       ))}
-      {paging.pages > 5 && (
+      {totalPages > 5 && (
       <div className="flex">
-        {paging.page < (paging.pages - 3) && (
+        {pageIndex < (totalPages - 3) && (
         <span className="mr-3 text-dark-300">
           ...
         </span>
         )}
         <button
-          onClick={() => setPaging({ ...paging, page: paging.pages - 1 })}
+          onClick={() => setPagination({ ...pagination, pageIndex: totalPages - 1 })}
           type="button"
-          className={`${paging.page === (paging.pages - 1) ? 'bg-main-900' : 'bg-dark-200 hover:bg-main-900 '} transition duration-150 ease-in-out h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-semibold mr-3`}
+          className={`${pageIndex === (totalPages - 1) ? 'bg-main-900' : 'bg-dark-200 hover:bg-main-900 '} transition duration-150 ease-in-out h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-semibold mr-3`}
         >
-          {paging.pages}
+          {totalPages}
         </button>
       </div>
       )}
       <button
         type="button"
         className="font-semibold w-8 h-8  items-center justify-center text-dark-300 hover:text-main-900 transition duration-150 ease-in-out flex"
-        onClick={() => setPaging({ ...paging, page: paging.page < paging.pages - 1 ? paging.page + 1 : paging.page })}
+        onClick={() => setPagination({ ...pagination, pageIndex: pageIndex < totalPages - 1 ? pageIndex + 1 : pageIndex })}
       >
         <div>
           <ChevronRight />
@@ -92,61 +97,104 @@ function Pages({ setPaging, paging }) {
   );
 }
 
-function Results({ paging }) {
+// Results
+function ShowedResults({ pagination }) {
   return (
     <div className="text-dark-500 flex-1 mr-3 text-ellipsis overflow-hidden whitespace-nowrap">
       Showing
-      {' '}
-      {(paging.page * paging.pageSize + 1)}
-      -
-      {paging.pageSize * (paging.page + 1) > paging.dataLength ? paging.dataLength : paging.pageSize * (paging.page + 1)}
-      {' '}
-      of
-      {' '}
-      {paging.dataLength}
-      {' '}
+      {pagination.dataLength > 0 ? (
+        <>
+          {' '}
+          {(pagination.pageIndex * pagination.pageSize + 1)}
+          -
+          {pagination.pageSize * (pagination.pageIndex + 1) > pagination.dataLength ? pagination.dataLength : pagination.pageSize * (pagination.pageIndex + 1)}
+          {' '}
+          of
+          {' '}
+          {pagination.dataLength}
+          {' '}
+        </>
+      ) : ' 0 '}
       Results
     </div>
   );
 }
 
-function PageSize({ paging, setPaging }) {
-  return (
-    <div className="flex-1 hidden md:flex justify-end items-center">
-      <span className="text-dark-500">
-        Show
-      </span>
-      <select
-        value={paging.pageSize}
-        onChange={(e) => setPaging({ ...paging, pageSize: Number(e.target.value) })}
-        className="bg-main-900 mx-2 w-12 py-1 rounded-full appearance-none text-center outline-none hover:bg-dark-900 text-white transition duration-150 ease-in-out cursor-pointer"
-      >
-        {paging.pageSizeOptions.map((item) => (
-          <option value={item + 1}>
-            {item === paging.dataLength - 1 ? 'All' : item + 1}
-          </option>
-        ))}
-      </select>
-      <span className="text-dark-500">
-        Results
-      </span>
-    </div>
-  );
+// Page Size Component
+function PageSizeButton({ pagination, setPagination }) {
+  if (pagination.dataLength > 0) {
+    return (
+      <div className="flex-1 hidden md:flex justify-end items-center">
+        <span className="text-dark-500">
+          Show
+        </span>
+        <select
+          value={pagination.pageSize}
+          onChange={(e) => setPagination({ ...pagination, pageSize: Number(e.target.value) })}
+          className="bg-main-900 mx-2 w-12 py-1 rounded-full appearance-none text-center outline-none hover:bg-dark-900 text-white transition duration-150 ease-in-out cursor-pointer"
+        >
+          {pagination.pageSizeOptions.map((item) => (
+            <option value={item + 1}>
+              {item === pagination.dataLength - 1 ? 'All' : item + 1}
+            </option>
+          ))}
+        </select>
+        <span className="text-dark-500">
+          Results
+        </span>
+      </div>
+    );
+  }
+  return null;
 }
+
+// Table Component
 function Table({
-  data, columns, type, showPagination,
+  data: initialData = [],
+  columns: initialColumns = [],
+  dataType,
+  pagination: showPagination,
+  customColumns,
+  selection: showSelection,
+  sticky: isSticky,
+  sort: showSort,
+  search: showSearch,
+  showModal,
 }) {
   const { enqueueSnackbar } = useSnackbar();
+
+  // Columns
+  const [columns, setColumns] = useState(initialColumns.map((item) => ({ ...item, hidden: false })));
+
+  // Search
   const [search, setSearch] = useState('');
 
+  const matchSearch = () => (
+    [...initialData].filter((item) => {
+      const valid = false;
+      Object.keys(item).map((el) => {
+        let element = item[el];
+        if (typeof item[el] === 'number') {
+          element = element.toString();
+        }
+        if (element.toLowerCase().includes(search.toLowerCase())) {
+          valid = true;
+        }
+      });
+      return valid;
+    })
+  );
+
+  const [searchedData, setSearchedData] = useState(matchSearch());
+
   // Paging
-  const [paging, setPaging] = useState({
-    page: 0,
-    pages: Math.round(data.length / data.length),
-    dataLength: data.length,
-    pageSize: data.length,
-    pageSizeOptions: [...Array(data.length).keys()]
-      .filter((_, index) => (index + 1) % 5 === 0 || index === data.length),
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    totalPages: Math.round(searchedData.length / searchedData.length),
+    dataLength: searchedData.length,
+    pageSize: searchedData.length,
+    pageSizeOptions: [...Array(searchedData.length).keys()]
+      .filter((_, index) => (index + 1) % 5 === 0 || index === (searchedData.length - 1)),
   });
 
   // Sorting
@@ -155,6 +203,13 @@ function Table({
     type: 'initial',
   });
 
+  // Select
+  const [selected, setSelected] = useState({
+    all: false,
+    elements: [],
+  });
+
+  // Handle Sorting
   const handleSorting = (e, sortBy) => {
     e.preventDefault();
     if (sort.sortBy === sortBy) {
@@ -191,12 +246,14 @@ function Table({
     return 0;
   };
 
-  // Select
-  const [selected, setSelected] = useState({
-    all: false,
-    elements: [],
-  });
+  // Filtered Data
+  const handleFilteredData = [...searchedData]
+    .sort(sortedData)
+    .slice((pagination.pageIndex * pagination.pageSize + 1) - 1, pagination.pageSize * (pagination.pageIndex + 1));
 
+  const [filteredData, setFilteredData] = useState(handleFilteredData);
+
+  // Select
   const handleSelection = (e, el) => {
     e.preventDefault();
     const arr = [...selected.elements];
@@ -204,7 +261,7 @@ function Table({
     const index = arr.findIndex((item) => item === el);
     if (index < 0) {
       arr.push(el);
-      if (arr.length === data.length) {
+      if (arr.length === searchedData.length) {
         all = true;
       }
     } else {
@@ -213,49 +270,33 @@ function Table({
     setSelected({ all, elements: arr });
   };
 
-  // Handle Data
-  const handleFilteredData = [...data]
-    .filter((item) => {
-      let valid = false;
-      Object.keys(item).map((el) => {
-        if (item[el].toLowerCase().includes(search.toLowerCase())) {
-          valid = true;
-        }
-      });
-      return valid;
-    })
-    .sort(sortedData)
-    .slice((paging.page * paging.pageSize + 1) - 1, paging.pageSize * (paging.page + 1));
-
-  const [filteredData, setFilteredData] = useState(handleFilteredData);
-
   // Updates
   useEffect(() => {
     setFilteredData(handleFilteredData);
-    setPaging(
+    setPagination(
       {
-        ...paging,
-        page: paging.page >= Math.ceil(data.length / paging.pageSize) ? 0 : paging.page,
-        pages: Math.ceil(data.length / paging.pageSize),
-        dataLength: data.length,
-        pageSizeOptions: [...Array(data.length).keys()]
-          .filter((_, index) => (index + 1) % 5 === 0 || index === (data.length - 1)),
+        ...pagination,
+        pageIndex: pagination.pageIndex >= Math.ceil(searchedData.length / pagination.pageSize) ? 0 : pagination.pageIndex,
+        totalPages: Math.ceil(searchedData.length / pagination.pageSize),
+        dataLength: searchedData.length,
+        pageSizeOptions: [...Array(searchedData.length).keys()]
+          .filter((_, index) => (index + 1) % 5 === 0 || index === (searchedData.length - 1)),
       },
     );
-  }, [paging.pageSize, data, search]);
+  }, [pagination.pageSize, searchedData]);
 
   useEffect(() => {
     setFilteredData(handleFilteredData);
-  }, [paging.page, sort, search]);
+  }, [pagination.pageIndex, sort]);
 
   // CSV
   const generateCSV = () => {
-    const csvHeaders = columns.map((item) => ({ label: item.title, key: item.key }));
+    const csvHeaders = columns.map((item) => ({ label: item.label, key: item.key }));
     let csvData = [];
     if (!isEmpty(selected.elements) && !selected.all) {
       csvData = [...selected.elements];
     } else {
-      csvData = [...data];
+      csvData = [...searchedData];
     }
 
     return ({ headers: csvHeaders, data: csvData });
@@ -268,27 +309,31 @@ function Table({
     function handleResize() {
       setWidth(window.innerWidth);
     }
-
     window.addEventListener('resize', handleResize);
-
     return (_) => {
       window.removeEventListener('resize', handleResize);
     };
   });
 
   useEffect(() => {
-    if (width < 768 && filteredData.length < data.length) {
-      setPaging({ ...paging, pageSize: data.length });
+    if (width < 768 && filteredData.length < searchedData.length) {
+      setPagination({ ...pagination, pageSize: searchedData.length });
     }
   }, [width, filteredData]);
+
+  useEffect(() => {
+    setSearchedData(matchSearch());
+  }, [search]);
+
+  const filteredColumns = columns.filter((item) => !item.hidden);
 
   return (
     <>
       {/* Search  */}
-      {showPagination && (
-      <section className={`pb-5 flex items-center ${data.length > 0 ? 'justify-between' : 'justify-end'}`}>
-        {data.length > 0 && (
-        <div className="border-2 border-dark-300 h-10 rounded-full flex items-center relative flex-1 md:max-w-md mr-3">
+      {initialData.length > 0 && showPagination && (
+      <section className={`pb-5 flex items-center  ${showSearch ? 'justify-between' : 'justify-end'}`}>
+        {showSearch && (
+        <div className="border-2 border-dark-300 h-10 rounded-md flex items-center relative flex-1 md:max-w-md mr-3">
           <div className="text-dark-400 absolute left-3">
             <Search className="h-5 w-5" strokeWidth={2.5} />
           </div>
@@ -301,158 +346,226 @@ function Table({
           />
         </div>
         )}
-        <div className={`flex items-center justify-end ${data.length === 0 && 'w-full'}`}>
-          {data.length > 0 && (
-          <CSVLink
-            className="h-10 hidden sm:flex items-center mr-3 justify-center px-10 bg-white text-sm font-semibold text-main-900 rounded-full hover:bg-main-900 hover:text-white transition duration-150 ease-in-out border-2 border-main-900"
-            onClick={() => enqueueSnackbar('CSV File Downloaded Successfully.', { variant: 'success', preventDuplicate: true })}
-            data={generateCSV().data}
-            headers={generateCSV().headers}
-            filename={(`${type.key === 'product' && 'Products-'}${moment().format('MMM-DD-YYYY')}`).toLocaleLowerCase()}
-          >
-            Export
-            {' '}
-            {!isEmpty(selected.elements) && !selected.all ? 'Selected' : 'All'}
-          </CSVLink>
-          )}
-          <button
-            type="button"
-            className={`shrink-0 h-10 px-10 bg-main-900 text-sm font-semibold text-white rounded-full hover:bg-dark-900 transition duration-150 ease-in-out border-2 border-main-900 hover:border-dark-900 ${data.length === 0 && 'w-full md:w-auto'}`}
-          >
-            {selected.elements.length === 1
-              ? 'Duplicate' : 'Add'}
-            {' '}
-            <span className={`${data.length > 0 && 'hidden md:block'}`}>{type.label}</span>
-          </button>
+        <div className="flex items-center justify-end">
+          <Columns
+            columns={columns}
+            setColumns={setColumns}
+            filteredColumns={filteredColumns}
+          />
+          <div className="hidden sm:flex">
+            <CSVLink
+              className="h-10 flex items-center mr-3 justify-center px-10 bg-white text-sm font-semibold text-main-900 rounded-md hover:bg-main-900 hover:text-white transition duration-150 ease-in-out border-2 border-main-900"
+              onClick={() => enqueueSnackbar('CSV File Downloaded Successfully.', { variant: 'success', preventDuplicate: true })}
+              data={generateCSV().data}
+              headers={generateCSV().headers}
+              filename={(`${dataType.key.p}-${moment().format('MMM-DD-YYYY')}`).toLocaleLowerCase()}
+            >
+              Export
+              {' '}
+              {!isEmpty(selected.elements) && !selected.all ? 'Selected' : 'All'}
+            </CSVLink>
+            <button
+              onClick={showModal}
+              type="button"
+              className="shrink-0 h-10 px-10 bg-main-900 text-sm font-semibold text-white rounded-md hover:bg-dark-900 transition duration-150 ease-in-out border-2 border-main-900 hover:border-dark-900"
+            >
+              {selected.elements.length === 1
+                ? 'Duplicate' : 'Add'}
+              {' '}
+              {dataType && dataType.label && dataType.label.s ? dataType.label.s : 'New'}
+            </button>
+          </div>
         </div>
       </section>
       )}
       {/* Table  */}
       <section
-        className={`flex-1 overflow-auto flex ${showPagination && 'pb-5'}`}
+        className="flex-1 overflow-auto flex pb-5"
       >
         <div className="bg-dark-100 rounded-md w-full overflow-auto">
-          {data.length > 0 ? (
+          {initialData.length > 0 && filteredColumns.length > 0 && (
             <table className="table-fixed border-collapse w-full text-sm">
               <colgroup>
-                {columns.map((item) => <col width={item.width} />)}
+                {showSelection && <col width={50} />}
+                {filteredColumns.map((item) => <col width={filteredColumns.length < 5 ? 'auto' : '150'} />)}
               </colgroup>
               <thead className="bg-main-900 text-left h-12 rounded-md sticky top-0 text-dark-100 z-10">
                 <tr>
-                  {columns.map((item) => (
+                  {showSelection && (
+                  <th className="bg-main-900 sticky left-0 z-20">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (selected.all || (!selected.all && selected.elements.length > 0)) {
+                          setSelected({ elements: [], all: false });
+                        } else {
+                          setSelected({ elements: [...initialData], all: true });
+                        }
+                      }}
+                      type="button"
+                      className="-mt-[1px] group w-full h-12 flex items-center justify-center"
+                    >
+                      <div
+                        className={`h-[15px] w-[15px] border-2 flex items-center justify-center rounded-sm transition duration-150 ease-in-out ${selected.all || selected.elements.length > 0 ? 'bg-white border-white' : 'border-white border-opacity-30 group-hover:border-opacity-100'}`}
+                      >
+                        {selected.all && (
+                        <div>
+                          <Check className="text-main-900 h-3 w-3" strokeWidth={3} />
+                        </div>
+                        )}
+                        {!selected.all && selected.elements.length > 0 && (
+                        <div>
+                          <Minus className="text-main-900 h-3 w-3" strokeWidth={3} />
+                        </div>
+                        )}
+                      </div>
+                    </button>
+                  </th>
+                  )}
+                  {filteredColumns.map((item) => (
                     <th
-                      className={`${item.key === 'sku' ? 'sticky left-0 top-0 bg-main-900 z-20 pr-3' : 'px-3'}`}
+                      className={`px-3 ${showSelection && 'pl-0'} ${item.key === isSticky && `sticky ${showSelection ? 'left-[50px]' : 'left-0'} top-0 bg-main-900 z-20`}`}
                       id={item.key}
                     >
                       <div className="flex items-center">
-                        {item.key === 'sku' && (
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setSelected({ elements: selected.all ? [] : [...data], all: !selected.all });
-                          }}
-                          type="button"
-                          className="px-5 -mt-[1px] h-12 group"
-                        >
-                          <div
-                            className={`h-[15px] w-[15px] border-2 flex items-center justify-center rounded-sm transition duration-150 ease-in-out ${selected.all ? 'bg-white border-white' : 'border-white border-opacity-30 group-hover:border-opacity-100'}`}
-                          >
-                            {selected.all && (
-                            <div>
-                              <Check className="text-main-900 h-3 w-3" strokeWidth={3} />
-                            </div>
-                            )}
-                          </div>
-                        </button>
-                        )}
                         <button
                           type="button"
-                          className="group h-12 w-full text-left flex items-center "
-                          onClick={(e) => handleSorting(e, item.key)}
+                          className={`group h-12 w-full text-left flex items-center ${!showSort && 'cursor-default'}`}
+                          onClick={(e) => showSort && handleSorting(e, item.key)}
                         >
                           <span className="mr-5">
-                            {item.title}
+                            {item.label}
                           </span>
-                          <div className="">
+                          {showSort && (
+                          <div>
                             <div
-                              className={`opacity-30 group-hover:opacity-100 transition duration-150 ease-in-out ${sort.sortBy === item.key && sort.type === 'descending' && 'invisible'} ${sort.sortBy === item.key && sort.type === 'ascending' && 'opacity-100'}`}
+                              className={`group-hover:opacity-100 transition duration-150 ease-in-out ${sort.sortBy === item.key && sort.type === 'descending' && 'invisible'} ${sort.sortBy === item.key && sort.type === 'ascending' ? 'opacity-100' : 'opacity-30'}`}
                             >
                               <ChevronUp className="h-3 w-3" strokeWidth={2.5} />
                             </div>
                             <div
-                              className={`-mt-1 opacity-30 group-hover:opacity-100 transition duration-150 ease-in-out ${sort.sortBy === item.key && sort.type === 'ascending' && 'invisible'} ${sort.sortBy === item.key && sort.type === 'ascending' && 'opacity-100'}`}
+                              className={`-mt-1 group-hover:opacity-100 transition duration-150 ease-in-out ${sort.sortBy === item.key && sort.type === 'ascending' && 'invisible'} ${sort.sortBy === item.key && sort.type === 'descending' ? 'opacity-100' : 'opacity-30'}`}
                             >
                               <ChevronDown className="h-3 w-3" strokeWidth={2.5} />
                             </div>
                           </div>
+                          )}
                         </button>
                       </div>
                     </th>
                   ))}
                 </tr>
               </thead>
+              {filteredData.length > 0 && (
               <tbody>
                 {filteredData.map((item) => (
-                  <Link href={`products/${item.sku}`}>
-                    <tr className="border-b border-dark-200 hover:bg-dark-200 cursor-pointer group">
-                      {Object.keys(item).map((el) => {
-                        const searchIndex = item[el].toLowerCase().indexOf(search.toLowerCase());
-                        const matchedSearch = (item[el].toLowerCase().includes(search.toLowerCase()) && search) ? [item[el].slice(0, searchIndex), item[el].slice(searchIndex, searchIndex + search.length), item[el].slice(searchIndex + search.length, item[el].length)].filter((i) => i.length > 0) : [item[el]];
-                        return (
-                          <td className={`h-14 ${el === 'sku' ? 'sticky left-0 bg-dark-100 group-hover:bg-dark-200 pr-3' : 'px-3'}`}>
-                            <div className="flex items-center">
-                              {el === 'sku' && (
-                              <button
-                                onClick={(e) => handleSelection(e, item)}
-                                type="button"
-                                className="px-5 -mt-[1px] h-14"
-                              >
-                                <div
-                                  className={`h-[15px] w-[15px] border-2 flex items-center justify-center rounded-sm  transition duration-150 ease-in-out ${selected.elements.includes(item) ? 'bg-main-900 border-main-900' : 'border-dark-300 hover:border-main-900'}`}
-                                >
-                                  {selected.elements.includes(item) && (
-                                  <div>
-                                    <Check className="text-dark-100 h-3 w-3" strokeWidth={3} />
-                                  </div>
-                                  )}
-                                </div>
-                              </button>
+                  <Link href={`${dataType.key.p}/${item.id}`}>
+                    <tr className="border-b border-dark-200 last:border-none hover:bg-dark-200 cursor-pointer group">
+                      {showSelection && (
+                        <td className="sticky left-0 bg-dark-100 group-hover:bg-dark-200">
+                          <button
+                            onClick={(e) => handleSelection(e, item)}
+                            type="button"
+                            className="-mt-[1px] h-14 w-full flex items-center justify-center"
+                          >
+                            <div
+                              className={`h-[15px] w-[15px] border-2 flex items-center justify-center rounded-sm  transition duration-150 ease-in-out ${selected.elements.includes(item) ? 'bg-main-900 border-main-900' : 'border-dark-300 hover:border-main-900'}`}
+                            >
+                              {selected.elements.includes(item) && (
+                              <div>
+                                <Check className="text-dark-100 h-3 w-3" strokeWidth={3} />
+                              </div>
                               )}
-                              {matchedSearch.map((element) => {
-                                const nu = null;
-                                return (
-                                  <span className={`whitespace-pre ${element.toLowerCase() === search.toLowerCase() && 'font-semibold text-main-900'}`}>{element}</span>
-                                );
-                              })}
                             </div>
-                          </td>
+                          </button>
+                        </td>
+                      )}
+                      {filteredColumns.map((el) => {
+                        let element = item[el.key];
+                        if (typeof item[el.key] === 'number') {
+                          element = element.toString();
+                        }
+                        const searchIndex = element.toLowerCase().indexOf(search.toLowerCase());
+                        const matchedSearch = (element.toLowerCase().includes(search.toLowerCase()) && search) ? [element.slice(0, searchIndex), element.slice(searchIndex, searchIndex + search.length), element.slice(searchIndex + search.length, element.length)].filter((i) => i.length > 0) : [element];
+                        const CustomTD = customColumns && customColumns[el.key];
+                        return (
+                          CustomTD ? (
+                            <CustomTD
+                              columnKey={el.key}
+                              row={item}
+                            />
+                          ) : (
+                            <td
+                              className={`h-14 px-3 ${showSelection && 'pl-0'} ${el.key === isSticky && `sticky ${showSelection ? 'left-[50px]' : 'left-0'} bg-dark-100 group-hover:bg-dark-200`}`}
+                            >
+                              <div
+                                className="flex items-center"
+                              >
+                                {matchedSearch.map((element, index) => (
+                                  <span className={`${el.key === 'sku' && 'uppercase'} whitespace-pre ${matchedSearch.length === index + 1 && 'text-ellipsis overflow-hidden whitespace-nowrap'} ${element.toLowerCase() === search.toLowerCase() && 'font-semibold text-main-900'}`}>
+                                    {element}
+                                  </span>
+                                ))}
+                              </div>
+                            </td>
+                          )
                         );
                       })}
                     </tr>
                   </Link>
                 ))}
               </tbody>
+              )}
             </table>
-          ) : (
-            <div className="p-5 h-full flex items-center justify-center">
-              <div>
-                <Add className="h-52" />
-                <h6 className="mt-10">
-                  You don't have any
-                  {' '}
-                  {type.keyP}
-                  {' '}
-                  yet.
-                </h6>
-              </div>
+          )}
+          {initialData.length > 0 && filteredData.length === 0 && (
+          <div className="p-5 h-[calc(100%-50px)] flex items-center justify-center">
+            <div className="max-w-md flex flex-col items-center">
+              <Void className="h-40" />
+              <h3 className="mt-10 font-semibold">
+                We're Sorry.
+              </h3>
+              <h6 className="text-center max-w-xs">
+                We couldn't find any
+                {' '}
+                {dataType && dataType.key && dataType.key.p ? dataType.key.p : 'results'}
+                {' '}
+                matching this search.
+              </h6>
             </div>
+          </div>
+          )}
+          {initialData.length === 0 && (
+          <div className="p-5 h-full flex items-center justify-center">
+            <div className="max-w-md flex flex-col items-center">
+              <Add className="h-40" />
+              <h3 className="mt-10 font-semibold">
+                You don't have any
+                {' '}
+                {dataType && dataType.label && dataType.label.p ? dataType.label.p : 'Items'}
+                .
+              </h3>
+              <h6 className="text-center max-w-xs">
+                Start by creating your first
+                {' '}
+                {dataType && dataType.key && dataType.key.s ? dataType.key.s : 'Item'}
+                .
+              </h6>
+              <button type="button" className="mt-5 shrink-0 h-10 px-10 bg-main-900 text-sm font-semibold text-white rounded-md hover:bg-dark-900 transition duration-150 ease-in-out border-2 border-main-900 hover:border-dark-900">
+                {selected.elements.length === 1
+                  ? 'Duplicate' : 'Add'}
+                {' '}
+                {dataType && dataType.label && dataType.label.s ? dataType.label.s : 'New'}
+              </button>
+            </div>
+          </div>
           )}
         </div>
       </section>
       {/* Pagination */}
-      {data.length > 0 && showPagination && (
+      {initialData.length > 0 && showPagination && (
       <section className="-mx-5 h-16 shrink-0 border-t border-dark-300 flex items-center px-5 justify-between text-sm">
-        {(isEmpty(selected.elements)) ? (<Results paging={paging} />)
+        {(isEmpty(selected.elements)) ? (<ShowedResults pagination={pagination} />)
           : (
             <div className="flex-1 flex items-center">
               <button
@@ -466,8 +579,13 @@ function Table({
 
             </div>
           )}
-        {paging.pages > 1 && (<Pages paging={paging} setPaging={setPaging} />)}
-        <PageSize paging={paging} setPaging={setPaging} />
+        {pagination.totalPages > 1 && (
+        <PagesNavigation
+          pagination={pagination}
+          setPagination={setPagination}
+        />
+        )}
+        <PageSizeButton pagination={pagination} setPagination={setPagination} />
 
       </section>
       )}

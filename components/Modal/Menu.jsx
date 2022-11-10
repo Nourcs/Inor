@@ -24,7 +24,6 @@ function MenuComponent({ setFilter, options, filter }) {
             )}
           </div>
         </button>
-
         <div
           style={{
             boxShadow: 'rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px, rgba(17, 17, 26, 0.1) 0px 24px 80px',
@@ -39,14 +38,13 @@ function MenuComponent({ setFilter, options, filter }) {
                 setFilter(item);
                 setFilterOpen(false);
               }}
-              className={`w-full text-left p-3 border-b last-border-none border-dark-100 ${filter.value === item.value ? 'bg-main-900 text-white' : 'hover:bg-dark-100'}`}
+              className={`w-full text-left p-3 border-b last:border-none border-dark-100 ${filter.value === item.value ? 'bg-main-900 text-white' : 'hover:bg-dark-100'}`}
             >
               {item.label}
 
             </button>
           ))}
         </div>
-
       </div>
     </OutsideClickHandler>
   );

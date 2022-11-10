@@ -2,18 +2,18 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import Layout from '../../../components/Layouts/Layout';
 
-function Product() {
-  const { query: { product } } = useRouter();
+function Supplier() {
+  const { query: { supplier } } = useRouter();
   return (
     <div className="p-5">
-      Product
+      Supplier
       {' '}
-      {product}
+      {supplier}
     </div>
   );
 }
 
-Product.getLayout = function getLayout(page) {
+Supplier.getLayout = function getLayout(page) {
   return (
     <Layout>
       {page}
@@ -21,4 +21,4 @@ Product.getLayout = function getLayout(page) {
   );
 };
 
-export default Product;
+export default Supplier;
